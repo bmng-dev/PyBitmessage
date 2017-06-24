@@ -18,6 +18,9 @@ BMConfigDefaults = {
     "network": {
         "asyncore": False
     },
+    "knownnodes": {
+        "maxnodes": 20000,
+    },
     "zlib": {
         'maxsize': 1048576
     }
