@@ -141,30 +141,6 @@ def check_openssl():
         return True
     return False
 
-#TODO: The minimum versions of pythondialog and dialog need to be determined
-def check_curses():
-    if sys.hexversion < 0x20600F0:
-        logger.error('The curses interface requires the pythondialog package and the dialog utility.')
-        return False
-    try:
-        import curses
-    except ImportError:
-        logger.error('The curses interface can not be used. The curses module is not available.')
-        return False
-    logger.info('curses Module Version: ' + curses.version)
-    try:
-        import dialog
-    except ImportError:
-        logger.error('The curses interface can not be used. The pythondialog package is not available.')
-        return False
-    logger.info('pythondialog Package Version: ' + dialog.__version__)
-    dialog_util_version = dialog.Dialog().cached_backend_version
-    #The pythondialog author does not like Python2 str, so we have to use
-    #unicode for just the version otherwise we get the repr form which includes
-    #the module and class names along with the actual version.
-    logger.info('dialog Utility Version' + unicode(dialog_util_version))
-    return True
-
 def check_pyqt():
     try:
         import PyQt4.QtCore
@@ -245,7 +221,7 @@ def check_dependencies(verbose = False, optional = False):
 
     check_functions = [check_hashlib, check_sqlite, check_openssl, check_msgpack]
     if optional:
-        check_functions.extend([check_pyqt, check_curses])
+        check_functions.extend([check_pyqt])
 
     #Unexpected exceptions are handled here
     for check in check_functions:

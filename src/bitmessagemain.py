@@ -172,10 +172,6 @@ class Main:
 
         shared.daemon = daemon
 
-        # get curses flag
-        if '-c' in sys.argv:
-            state.curses = True
-
         # is the application already running?  If yes then exit.
         shared.thisapp = singleinstance("", daemon)
 
@@ -243,20 +239,12 @@ class Main:
             upnpThread.start()
 
         if daemon == False and BMConfigParser().safeGetBoolean('bitmessagesettings', 'daemon') == False:
-            if state.curses == False:
-                if not depends.check_pyqt():
-                    print('PyBitmessage requires PyQt unless you want to run it as a daemon and interact with it using the API. You can download PyQt from http://www.riverbankcomputing.com/software/pyqt/download   or by searching Google for \'PyQt Download\'. If you want to run in daemon mode, see https://bitmessage.org/wiki/Daemon')
-                    print('You can also run PyBitmessage with the new curses interface by providing \'-c\' as a commandline argument.')
-                    sys.exit()
+            if not depends.check_pyqt():
+                print('PyBitmessage requires PyQt unless you want to run it as a daemon and interact with it using the API. You can download PyQt from http://www.riverbankcomputing.com/software/pyqt/download   or by searching Google for \'PyQt Download\'. If you want to run in daemon mode, see https://bitmessage.org/wiki/Daemon')
+                sys.exit()
 
-                import bitmessageqt
-                bitmessageqt.run()
-            else:
-                if True:
-#                if depends.check_curses():
-                    print('Running with curses')
-                    import bitmessagecurses
-                    bitmessagecurses.runwrapper()
+            import bitmessageqt
+            bitmessageqt.run()
         else:
             BMConfigParser().remove_option('bitmessagesettings', 'dontconnect')
 

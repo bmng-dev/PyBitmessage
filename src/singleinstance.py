@@ -26,7 +26,7 @@ class singleinstance:
         self.lockPid = None
         self.lockfile = os.path.normpath(os.path.join(state.appdata, 'singleton%s.lock' % flavor_id))
 
-        if not self.daemon and not state.curses:
+        if not self.daemon:
             # Tells the already running (if any) application to get focus.
             import bitmessageqt
             bitmessageqt.init()
