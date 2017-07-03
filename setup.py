@@ -35,7 +35,6 @@ if __name__ == "__main__":
             'pybitmessage.bitmessageqt',
             'pybitmessage.bitmessagecurses',
             'pybitmessage.messagetypes',
-            'pybitmessage.network',
             'pybitmessage.pyelliptic',
             'pybitmessage.socks',
             'pybitmessage.plugins'
