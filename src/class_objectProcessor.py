@@ -16,7 +16,6 @@ from addresses import *
 from bmconfigparser import BMConfigParser
 import helper_generic
 from helper_generic import addDataPadding
-import helper_bitcoin
 import helper_inbox
 import helper_msgcoding
 import helper_sent
@@ -438,9 +437,6 @@ class objectProcessor(threading.Thread):
             logger.debug('ECDSA verify failed')
             return
         logger.debug('ECDSA verify passed')
-        logger.debug('As a matter of intellectual curiosity, here is the Bitcoin address associated with the keys owned by the other person: %s  ..and here is the testnet address: %s. The other person must take their private signing key from Bitmessage and import it into Bitcoin (or a service like Blockchain.info) for it to be of any use. Do not use this unless you know what you are doing.' %
-                     (helper_bitcoin.calculateBitcoinAddressFromPubkey(pubSigningKey), helper_bitcoin.calculateTestnetAddressFromPubkey(pubSigningKey))
-                     )
         sigHash = hashlib.sha512(hashlib.sha512(signature).digest()).digest()[32:] # Used to detect and ignore duplicate messages in our inbox
 
         # calculate the fromRipe.

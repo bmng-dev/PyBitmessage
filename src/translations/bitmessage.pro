@@ -9,7 +9,6 @@ SOURCES	= 	../addresses.py\
 			../class_singleListener.py\
 			../class_singleWorker.py\
 			../class_sqlThread.py\
-			../helper_bitcoin.py\
 			../helper_bootstrap.py\
 			../helper_generic.py\
 			../helper_inbox.py\
