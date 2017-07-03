@@ -46,8 +46,6 @@ from class_outgoingSynSender import outgoingSynSender
 from class_singleListener import singleListener
 from class_singleWorker import singleWorker
 from class_addressGenerator import addressGenerator
-from class_smtpDeliver import smtpDeliver
-from class_smtpServer import smtpServer
 from bmconfigparser import BMConfigParser
 
 # Helper Functions
@@ -203,16 +201,6 @@ class Main:
         sqlLookup = sqlThread()
         sqlLookup.daemon = False  # DON'T close the main program even if there are threads left. The closeEvent should command this thread to exit gracefully.
         sqlLookup.start()
-
-        # SMTP delivery thread
-        if daemon and BMConfigParser().safeGet("bitmessagesettings", "smtpdeliver", '') != '':
-            smtpDeliveryThread = smtpDeliver()
-            smtpDeliveryThread.start()
-
-        # SMTP daemon thread
-        if daemon and BMConfigParser().safeGetBoolean("bitmessagesettings", "smtpd"):
-            smtpServerThread = smtpServer()
-            smtpServerThread.start()
 
         # Start the thread that calculates POWs
         objectProcessorThread = objectProcessor()

@@ -430,8 +430,6 @@ class sqlThread(threading.Thread):
             BMConfigParser().set('bitmessagesettings', 'onionport', '8444')
         if not BMConfigParser().has_option('bitmessagesettings', 'onionbindip'):
             BMConfigParser().set('bitmessagesettings', 'onionbindip', '127.0.0.1')
-        if not BMConfigParser().has_option('bitmessagesettings', 'smtpdeliver'):
-            BMConfigParser().set('bitmessagesettings', 'smtpdeliver', '')
         if not BMConfigParser().has_option('bitmessagesettings', 'hidetrayconnectionnotifications'):
             BMConfigParser().set('bitmessagesettings', 'hidetrayconnectionnotifications', 'false')
         if BMConfigParser().has_option('bitmessagesettings', 'maxoutboundconnections'):
