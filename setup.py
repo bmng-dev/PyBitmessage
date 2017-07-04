@@ -40,7 +40,7 @@ if __name__ == "__main__":
         ],
         package_data={
             'pybitmessage': ['bitmsghash/*.cl', 'sslkeys/*.pem'],
-            'pybitmessage.bitmessageqt': ['*.ui', '../translations/*.qm'],
+            'pybitmessage.bitmessageqt': ['*.ui', 'translations/*.qm'],
         },
         ext_modules=[
             Extension(

@@ -115,13 +115,13 @@ def change_translation(newlocale):
         pass
 
     qmytranslator = QtCore.QTranslator()
-    translationpath = os.path.join (paths.codePath(), 'translations', 'bitmessage_' + newlocale)
+    translationpath = os.path.join (paths.codePath(), 'bitmessageqt', 'translations', 'bitmessage_' + newlocale)
     qmytranslator.load(translationpath)
     QtGui.QApplication.installTranslator(qmytranslator)
 
     qsystranslator = QtCore.QTranslator()
     if paths.frozen:
-        translationpath = os.path.join (paths.codePath(), 'translations', 'qt_' + newlocale)
+        translationpath = os.path.join (paths.codePath(), 'bitmessageqt', 'translations', 'qt_' + newlocale)
     else:
         translationpath = os.path.join (str(QtCore.QLibraryInfo.location(QtCore.QLibraryInfo.TranslationsPath)), 'qt_' + newlocale)
     qsystranslator.load(translationpath)

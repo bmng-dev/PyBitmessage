@@ -16,7 +16,7 @@ class LanguageBox(QtGui.QComboBox):
     def populate(self):
         self.languages = []
         self.clear()
-        localesPath = os.path.join (paths.codePath(), 'translations')
+        localesPath = os.path.join (paths.codePath(), 'bitmessageqt', 'translations')
         configuredLocale = "system"
         try:
             configuredLocale = BMConfigParser().get('bitmessagesettings', 'userlocale', "system")
