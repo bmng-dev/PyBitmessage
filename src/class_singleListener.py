@@ -1,19 +1,20 @@
+import errno
 import Queue
+import re
+import socket
 import threading
 import time
-import shared
-import socket
-from bmconfigparser import BMConfigParser
-from class_sendDataThread import sendDataThread
-from class_receiveDataThread import receiveDataThread
-from debug import logger
-import helper_bootstrap
-from helper_threading import StoppableThread
-import protocol
-import errno
-import re
 
+import helper_bootstrap
+import protocol
+import shared
 import state
+from bmconfigparser import BMConfigParser
+from class_receiveDataThread import receiveDataThread
+from class_sendDataThread import sendDataThread
+from debug import logger
+from helper_threading import StoppableThread
+
 
 # Only one singleListener thread will ever exist. It creates the
 # receiveDataThread and sendDataThread for each incoming connection. Note

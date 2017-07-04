@@ -1,14 +1,13 @@
-import os
 import socket
-import sys
 from binascii import hexlify, unhexlify
 from multiprocessing import current_process
 from threading import current_thread, enumerate
 
-from bmconfigparser import BMConfigParser
-from debug import logger
 import queues
 import shutdown
+from bmconfigparser import BMConfigParser
+from debug import logger
+
 
 def powQueueSize():
     curWorkerQueue = queues.workerQueue.qsize()

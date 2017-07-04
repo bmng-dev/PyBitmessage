@@ -12,34 +12,30 @@ if __name__ == "__main__":
     import sys
     sys.exit(0)
 
-from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler, SimpleXMLRPCServer
 import base64
+import hashlib
 import json
-from binascii import hexlify, unhexlify
-
-import shared
 import time
-from addresses import decodeAddress,addBMIfNotPresent,decodeVarint,calculateInventoryHash,varintDecodeError
-from bmconfigparser import BMConfigParser
+from binascii import hexlify, unhexlify
+from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler, SimpleXMLRPCServer
+from struct import pack
+
 import defaults
 import helper_inbox
 import helper_sent
-import hashlib
-
-import protocol
-import state
-from pyelliptic.openssl import OpenSSL
-import queues
-from struct import pack
-
-# Classes
-from helper_sql import sqlQuery,sqlExecute,SqlBulkExecute,sqlStoredProcedure
-from debug import logger
-from inventory import Inventory
-from version import softwareVersion
-
-# Helper Functions
 import proofofwork
+import protocol
+import queues
+import shared
+import state
+from addresses import (addBMIfNotPresent, calculateInventoryHash,
+                       decodeAddress, decodeVarint, varintDecodeError)
+from bmconfigparser import BMConfigParser
+from debug import logger
+from helper_sql import SqlBulkExecute, sqlExecute, sqlQuery, sqlStoredProcedure
+from inventory import Inventory
+from pyelliptic.openssl import OpenSSL
+from version import softwareVersion
 
 str_chan = '[chan]'
 

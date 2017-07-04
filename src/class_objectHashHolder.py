@@ -8,8 +8,9 @@
 # cannot be sure if Alice is the node who originated the message.
 
 import random
-import time
 import threading
+import time
+
 
 class objectHashHolder(threading.Thread):
     size = 10

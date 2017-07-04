@@ -1,24 +1,24 @@
 import errno
-import threading
-import time
 import Queue
 import random
-import shared
-import select
-import socks
 import socket
-import sys
-import tr
+import threading
+import time
 
-from class_sendDataThread import sendDataThread
-from class_receiveDataThread import receiveDataThread
-from debug import logger
-from bmconfigparser import BMConfigParser
-from helper_threading import StoppableThread
+import socks
+
 import knownnodes
 import protocol
 import queues
+import shared
 import state
+import tr
+from bmconfigparser import BMConfigParser
+from class_receiveDataThread import receiveDataThread
+from class_sendDataThread import sendDataThread
+from debug import logger
+from helper_threading import StoppableThread
+
 
 # For each stream to which we connect, several outgoingSynSender threads
 # will exist and will collectively create 8 connections with peers.
@@ -281,6 +281,5 @@ class outgoingSynSender(threading.Thread, StoppableThread):
                     logger.debug('deleting ' + str(peer) + ' from knownnodes.knownNodes because it is more than 48 hours old and we could not connect to it.')
 
             except Exception as err:
-                import traceback
                 logger.exception('An exception has occurred in the outgoingSynSender thread that was not caught by other exception types:')
             self.stop.wait(0.1)

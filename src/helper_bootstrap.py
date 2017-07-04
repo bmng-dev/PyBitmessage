@@ -1,13 +1,15 @@
-import socket
-import defaultKnownNodes
 import pickle
+import socket
 import time
 
+import socks
+
+import defaultKnownNodes
+import knownnodes
+import state
 from bmconfigparser import BMConfigParser
 from debug import logger
-import knownnodes
-import socks
-import state
+
 
 def knownNodes():
     try:

@@ -1,5 +1,6 @@
-from helper_sql import sqlExecute, sqlQuery
 import queues
+from helper_sql import sqlExecute, sqlQuery
+
 
 def insert(t):
     sqlExecute('''INSERT INTO inbox VALUES (?,?,?,?,?,?,?,?,?,?)''', *t)

@@ -1,8 +1,8 @@
 import pickle
 import threading
 
-from bmconfigparser import BMConfigParser
 import state
+from bmconfigparser import BMConfigParser
 
 knownNodesLock = threading.Lock()
 knownNodes = {}

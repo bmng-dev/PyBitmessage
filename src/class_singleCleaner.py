@@ -1,19 +1,19 @@
-import threading
-import shared
-import time
-import sys
 import os
+import threading
+import time
 
-import tr#anslate
+import knownnodes
+import protocol
+import queues
+import shared
+import state
+import tr
 from bmconfigparser import BMConfigParser
+from debug import logger
 from helper_sql import sqlExecute, sqlQuery
 from helper_threading import StoppableThread
 from inventory import Inventory
-from debug import logger
-import knownnodes
-import queues
-import protocol
-import state
+
 
 """
 The singleCleaner class is a timer-driven thread that cleans data structures 

@@ -1,14 +1,15 @@
 from PyQt4 import QtCore, QtGui
-from tr import _translate
-import l10n
-import widgets
+
 from addresses import addBMIfNotPresent
 from bmconfigparser import BMConfigParser
-from dialogs import AddAddressDialog
 from helper_sql import sqlExecute, sqlQuery
+from tr import _translate
+
+import widgets
+from dialogs import AddAddressDialog
 from retranslateui import RetranslateMixin
-from utils import avatarize
 from uisignaler import UISignaler
+from utils import avatarize
 
 
 class Blacklist(QtGui.QWidget, RetranslateMixin):

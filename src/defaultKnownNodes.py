@@ -1,11 +1,10 @@
 import pickle
-import socket
-#from struct import *
-import time
-import random
 import sys
-from time import strftime, localtime
+import time
+from time import localtime, strftime
+
 import state
+
 
 def createDefaultKnownNodes(appdata):
     ############## Stream 1 ################

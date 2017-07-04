@@ -1,91 +1,59 @@
-from debug import logger
+import datetime
+import hashlib
+import locale
+import os
+import platform
+import random
+import string
+import subprocess
+import sys
+import textwrap
+import time
+
 withMessagingMenu = False
 try:
     import gi
     gi.require_version('MessagingMenu', '1.0')
-    from gi.repository import MessagingMenu
     gi.require_version('Notify', '0.7')
-    from gi.repository import Notify
+    from gi.repository import MessagingMenu, Notify
     withMessagingMenu = True
 except (ImportError, ValueError):
     MessagingMenu = None
 
+from debug import logger
 try:
     from PyQt4 import QtCore, QtGui
     from PyQt4.QtCore import QByteArray, QSettings, QString, Qt, QTimer
-    from PyQt4.QtGui import QApplication, QFileDialog, QFont, QIcon, QMenu, QMessageBox, QPainter, QSystemTrayIcon, QTableWidgetItem
+    from PyQt4.QtGui import (QApplication, QFileDialog, QFont, QIcon, QMenu,
+                             QMessageBox, QPainter, QSystemTrayIcon,
+                             QTableWidgetItem)
     from PyQt4.QtNetwork import QLocalSocket, QLocalServer
-
 except Exception as err:
     logmsg = 'PyBitmessage requires PyQt unless you want to run it as a daemon and interact with it using the API. You can download it from http://www.riverbankcomputing.com/software/pyqt/download or by searching Google for \'PyQt Download\' (without quotes).'
     logger.critical(logmsg, exc_info=True)
-    import sys
     sys.exit()
 
-try:
-    _encoding = QtGui.QApplication.UnicodeUTF8
-except AttributeError:
-    logger.exception('QtGui.QApplication.UnicodeUTF8 error', exc_info=True)
-
-from addresses import addBMIfNotPresent, decodeAddress, encodeVarint
-import shared
-from bitmessageui import Ui_MainWindow
-from bmconfigparser import BMConfigParser
-import defaults
-from namecoin import namecoinConnection, ensureNamecoinOptions
-from newaddressdialog import Ui_NewAddressDialog
-#from newaddresswizard import Ui_NewAddressWizard
-from messageview import MessageView
-from migrationwizard import Ui_MigrationWizard
-from foldertree import AccountMixin, MessageList_AddressWidget, MessageList_SubjectWidget, Ui_AddressBookWidgetItemAddress, Ui_AddressBookWidgetItemLabel, Ui_AddressWidget, Ui_FolderWidget, Ui_SubscriptionWidget
-from newsubscriptiondialog import Ui_NewSubscriptionDialog
-from regenerateaddresses import Ui_regenerateAddressesDialog
-from newchandialog import NewChanDialog
-#from safehtmlparser import *
-from specialaddressbehavior import Ui_SpecialAddressBehaviorDialog
-from emailgateway import Ui_EmailGatewayDialog, Ui_EmailGatewayRegistrationDialog
-from settings import Ui_settingsDialog
-import settingsmixin
-import support
-from about import Ui_aboutDialog
-from help import Ui_helpDialog
-from iconglossary import Ui_iconGlossaryDialog
-from connect import Ui_connectDialog
-import locale
-import sys
-from time import strftime, localtime, gmtime
-import time
-import os
-import hashlib
-from pyelliptic.openssl import OpenSSL
-import platform
-import textwrap
 import debug
-import random
-import subprocess
-import string
-import datetime
-from helper_sql import sqlExecute, sqlQuery, sqlStoredProcedure
+import defaults
 import helper_search
+import knownnodes
 import l10n
 import openclpow
-import types
-from utils import avatarize, str_broadcast_subscribers
-from collections import OrderedDict
-from account import accountClass, AccountColor, BMAccount, GatewayAccount, getSortedAccounts, getSortedSubscriptions, MailchuckAccount
-from class_objectHashHolder import objectHashHolder
-from class_singleWorker import singleWorker
-from dialogs import AddAddressDialog
-from helper_generic import powQueueSize
-from inventory import PendingDownloadQueue, PendingUpload, PendingUploadDeadlineException
-import knownnodes
 import paths
-from proofofwork import getPowType
 import queues
+import shared
 import shutdown
 import state
-from statusbar import BMStatusBar
 import throttle
+from addresses import addBMIfNotPresent, decodeAddress, encodeVarint
+from bmconfigparser import BMConfigParser
+from helper_generic import powQueueSize
+from helper_sql import sqlExecute, sqlQuery, sqlStoredProcedure
+from inventory import (PendingDownloadQueue, PendingUpload,
+                       PendingUploadDeadlineException)
+from namecoin import namecoinConnection
+from proofofwork import getPowType
+from pyelliptic.openssl import OpenSSL
 from version import softwareVersion
 
 try:
@@ -93,6 +61,39 @@ try:
 except ImportError:
     get_plugins = False
 
+import settingsmixin
+import support
+from about import Ui_aboutDialog
+from account import (AccountColor, BMAccount, GatewayAccount, MailchuckAccount,
+                     accountClass, getSortedAccounts, getSortedSubscriptions)
+from bitmessageui import Ui_MainWindow
+from connect import Ui_connectDialog
+from dialogs import AddAddressDialog
+from emailgateway import (Ui_EmailGatewayDialog,
+                          Ui_EmailGatewayRegistrationDialog)
+from foldertree import (AccountMixin, MessageList_AddressWidget,
+                        MessageList_SubjectWidget,
+                        Ui_AddressBookWidgetItemAddress,
+                        Ui_AddressBookWidgetItemLabel, Ui_AddressWidget,
+                        Ui_FolderWidget, Ui_SubscriptionWidget)
+from help import Ui_helpDialog
+from iconglossary import Ui_iconGlossaryDialog
+from messageview import MessageView
+from migrationwizard import Ui_MigrationWizard
+from newaddressdialog import Ui_NewAddressDialog
+#from newaddresswizard import Ui_NewAddressWizard
+from newchandialog import NewChanDialog
+from newsubscriptiondialog import Ui_NewSubscriptionDialog
+from regenerateaddresses import Ui_regenerateAddressesDialog
+from settings import Ui_settingsDialog
+from specialaddressbehavior import Ui_SpecialAddressBehaviorDialog
+from statusbar import BMStatusBar
+from utils import avatarize, str_broadcast_subscribers
+
+try:
+    _encoding = QtGui.QApplication.UnicodeUTF8
+except AttributeError:
+    logger.exception('QtGui.QApplication.UnicodeUTF8 error', exc_info=True)
 
 def _translate(context, text, disambiguation = None, encoding = None, number = None):
     if number is None:

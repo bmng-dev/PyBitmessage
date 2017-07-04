@@ -1,10 +1,10 @@
 import ConfigParser
 import datetime
-import shutil
 import os
+import shutil
 
-from singleton import Singleton
 import state
+from singleton import Singleton
 
 BMConfigDefaults = {
     "bitmessagesettings": {

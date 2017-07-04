@@ -7,10 +7,9 @@ except ImportError:
 import string
 import zlib
 
-from bmconfigparser import BMConfigParser
-import shared
-from debug import logger
 import messagetypes
+from bmconfigparser import BMConfigParser
+from debug import logger
 from tr import _translate
 
 BITMESSAGE_ENCODING_IGNORE = 0

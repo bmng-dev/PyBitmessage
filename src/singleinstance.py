@@ -1,10 +1,9 @@
 #! /usr/bin/env python
 
 import atexit
-import errno
-from multiprocessing import Process
 import os
 import sys
+
 import state
 
 try:

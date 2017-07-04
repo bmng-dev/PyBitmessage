@@ -1,17 +1,15 @@
 import ConfigParser
-from bmconfigparser import BMConfigParser
-import defaults
-import sys
 import os
-import locale
-import random
-import string
 import platform
+import random
+import sys
 from distutils.version import StrictVersion
 
-from namecoin import ensureNamecoinOptions
+import defaults
 import paths
 import state
+from bmconfigparser import BMConfigParser
+from namecoin import ensureNamecoinOptions
 
 storeConfigFilesInSameDirectoryAsProgramByDefault = False  # The user may de-select Portable Mode in the settings if they want the config files to stay in the application data folder.
 

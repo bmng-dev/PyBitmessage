@@ -1,10 +1,13 @@
+from string import find, lstrip, rfind, rstrip
+
 from PyQt4 import QtCore, QtGui
-from string import find, rfind, rstrip, lstrip
 
 from bmconfigparser import BMConfigParser
 from helper_sql import sqlExecute, sqlQuery
-from utils import avatarize
+
 from settingsmixin import SettingsMixin
+from utils import avatarize
+
 
 class AccountMixin (object):
     ALL = 0
@@ -271,7 +274,6 @@ class Ui_SubscriptionWidget(Ui_AddressWidget, AccountMixin):
         
     def setData(self, column, role, value):
         if role == QtCore.Qt.EditRole:
-            from debug import logger
             if isinstance(value, QtCore.QVariant):
                 label = str(value.toString().toUtf8()).decode('utf-8', 'ignore')
             else:
@@ -446,7 +448,6 @@ class Ui_AddressBookWidgetItem(QtGui.QTableWidgetItem, AccountMixin):
                 except:
                     sqlExecute('''UPDATE addressbook set label=? WHERE address=?''', self.label, self.address)
             elif self.type == AccountMixin.SUBSCRIPTION:
-                from debug import logger
                 sqlExecute('''UPDATE subscriptions set label=? WHERE address=?''', self.label, self.address)
             else:
                 pass

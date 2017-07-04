@@ -1,31 +1,29 @@
-import time
-import threading
-import shared
 import hashlib
-import random
-from struct import unpack, pack
-import sys
 import string
-from subprocess import call  # used when the API must execute an outside program
+import threading
+import time
 import traceback
 from binascii import hexlify
+from struct import unpack
+from subprocess import call
 
-from pyelliptic.openssl import OpenSSL
-import highlevelcrypto
-from addresses import calculateInventoryHash, decodeAddress, decodeVarint, encodeAddress, encodeVarint, varintDecodeError
-from bmconfigparser import BMConfigParser
-import helper_generic
-from helper_generic import addDataPadding
 import helper_inbox
 import helper_msgcoding
 import helper_sent
-from helper_sql import SqlBulkExecute, sqlExecute, sqlQuery
+import highlevelcrypto
+import l10n
 import protocol
 import queues
+import shared
 import state
 import tr
+from addresses import (calculateInventoryHash, decodeAddress, decodeVarint,
+                       encodeAddress, encodeVarint, varintDecodeError)
+from bmconfigparser import BMConfigParser
 from debug import logger
-import l10n
+from helper_sql import SqlBulkExecute, sqlExecute, sqlQuery
+from pyelliptic.openssl import OpenSSL
+
 
 class objectProcessor(threading.Thread):
     """

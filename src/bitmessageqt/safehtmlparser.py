@@ -1,8 +1,9 @@
-from HTMLParser import HTMLParser
 import inspect
 import re
-from urllib import quote, quote_plus
+from HTMLParser import HTMLParser
+from urllib import quote_plus
 from urlparse import urlparse
+
 
 class SafeHTMLParser(HTMLParser):
     # from html5lib.sanitiser

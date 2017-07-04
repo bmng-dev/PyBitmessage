@@ -1,21 +1,18 @@
-#import shared
-#import time
-#from multiprocessing import Pool, cpu_count
+import ctypes
 import hashlib
-from struct import unpack, pack
-from subprocess import call
+import os
 import sys
 import time
+from struct import pack, unpack
+from subprocess import call
+
+import openclpow
+import paths
+import queues
+import state
+import tr
 from bmconfigparser import BMConfigParser
 from debug import logger
-import paths
-import openclpow
-import queues
-import tr
-import os
-import ctypes
-
-import state
 
 bitmsglib = 'bitmsghash.so'
 

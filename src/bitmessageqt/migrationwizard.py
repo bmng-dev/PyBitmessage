@@ -1,5 +1,5 @@
 #!/usr/bin/env python2.7
-from PyQt4 import QtCore, QtGui
+from PyQt4 import QtGui
 
 class MigrationWizardIntroPage(QtGui.QWizardPage):
     def __init__(self):

@@ -1,24 +1,25 @@
 import ctypes
-from PyQt4 import QtCore, QtGui
 import ssl
 import sys
 import time
 
-import account
-from bmconfigparser import BMConfigParser
-from debug import logger
+from PyQt4 import QtCore, QtGui
+
 import defaults
-from foldertree import AccountMixin
-from helper_sql import sqlExecute, sqlQuery
-from l10n import getTranslationLanguage
-from openclpow import openclAvailable, openclEnabled
 import paths
-from proofofwork import bmpow
-from pyelliptic.openssl import OpenSSL
 import queues
 import shared
 import state
+from bmconfigparser import BMConfigParser
+from helper_sql import sqlExecute, sqlQuery
+from l10n import getTranslationLanguage
+from openclpow import openclEnabled
+from proofofwork import bmpow
+from pyelliptic.openssl import OpenSSL
 from version import softwareVersion
+
+import account
+from foldertree import AccountMixin
 
 # this is BM support address going to Peter Surda
 SUPPORT_ADDRESS = 'BM-2cTkCtMYkrSPwFTpgcBrMrf5d8oZwvMZWK'

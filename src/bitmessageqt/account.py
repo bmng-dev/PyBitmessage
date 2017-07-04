@@ -1,16 +1,19 @@
-from PyQt4 import QtCore, QtGui
-
-import queues
+import inspect
 import re
 import sys
-import inspect
-from helper_sql import sqlExecute, sqlQuery
+import time
+
+from PyQt4 import QtGui
+
+import queues
 from addresses import decodeAddress
 from bmconfigparser import BMConfigParser
-from foldertree import AccountMixin
+from helper_sql import sqlExecute, sqlQuery
 from pyelliptic.openssl import OpenSSL
+
+from foldertree import AccountMixin
 from utils import str_broadcast_subscribers
-import time
+
 
 def getSortedAccounts():
     configSections = BMConfigParser().addresses()

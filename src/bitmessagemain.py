@@ -19,39 +19,34 @@ sys.path.insert(0, app_dir)
 import depends
 depends.check_dependencies()
 
-import signal  # Used to capture a Ctrl-C keypress so that Bitmessage can shutdown gracefully.
-# The next 3 are used for the API
-from singleinstance import singleinstance
-import socket
 import ctypes
+import signal  # Used to capture a Ctrl-C keypress so that Bitmessage can shutdown gracefully.
+import socket
+import threading
 from struct import pack
 from subprocess import call
-import time
-
-from api import MySimpleXMLRPCRequestHandler, StoppableXMLRPCServer
-from helper_startup import isOurOperatingSystemLimitedToHavingVeryFewHalfOpenConnections
 
 import defaults
-import shared
+import helper_bootstrap
 import knownnodes
-import state
+import shared
 import shutdown
-import threading
-
-# Classes
-from class_sqlThread import sqlThread
-from class_singleCleaner import singleCleaner
+import state
+from api import MySimpleXMLRPCRequestHandler, StoppableXMLRPCServer
+from bmconfigparser import BMConfigParser
+from class_addressGenerator import addressGenerator
 from class_objectProcessor import objectProcessor
 from class_outgoingSynSender import outgoingSynSender
+from class_singleCleaner import singleCleaner
 from class_singleListener import singleListener
 from class_singleWorker import singleWorker
-from class_addressGenerator import addressGenerator
-from bmconfigparser import BMConfigParser
-
-# Helper Functions
-import helper_bootstrap
-import helper_generic
+from class_sqlThread import sqlThread
+from helper_startup import \
+    isOurOperatingSystemLimitedToHavingVeryFewHalfOpenConnections
 from helper_threading import StoppableThread
+from singleinstance import singleinstance
+
+import helper_generic
 
 
 def connectToStream(streamNumber):

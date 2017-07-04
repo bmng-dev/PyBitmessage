@@ -22,18 +22,17 @@
 import base64
 import httplib
 import json
-import socket
-import sys
-import os
-
-from bmconfigparser import BMConfigParser
-import defaults
-import tr # translate
-
 # FIXME: from debug import logger crashes PyBitmessage due to a circular
 # dependency. The debug module will also override/disable logging.getLogger()
 # loggers so module level logging functions are used instead
 import logging as logger
+import os
+import socket
+import sys
+
+import defaults
+import tr
+from bmconfigparser import BMConfigParser
 
 configSection = "bitmessagesettings"
 

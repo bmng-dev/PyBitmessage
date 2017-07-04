@@ -1,9 +1,11 @@
-from PyQt4 import QtGui
 import hashlib
 import os
+
+from PyQt4 import QtGui
+
+import state
 from addresses import addBMIfNotPresent
 from bmconfigparser import BMConfigParser
-import state
 
 str_broadcast_subscribers = '[Broadcast subscribers]'
 str_chan = '[chan]'

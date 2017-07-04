@@ -1,7 +1,9 @@
-from PyQt4 import uic
 import os.path
+
+from PyQt4 import uic
+
 import paths
-import sys
+
 
 def resource_path(resFile):
     baseDir = paths.codePath()

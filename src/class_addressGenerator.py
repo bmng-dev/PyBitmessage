@@ -1,21 +1,22 @@
-import shared
+import hashlib
+import sys
 import threading
 import time
-import sys
-from pyelliptic.openssl import OpenSSL
-import ctypes
-import hashlib
+from binascii import hexlify
+
+import defaults
 import highlevelcrypto
+import queues
+import shared
+import state
+import tr
 from addresses import decodeAddress, encodeAddress, encodeVarint
 from bmconfigparser import BMConfigParser
 from debug import logger
-import defaults
 from helper_threading import StoppableThread
 from pyelliptic import arithmetic
-import tr
-from binascii import hexlify
-import queues
-import state
+from pyelliptic.openssl import OpenSSL
+
 
 class addressGenerator(threading.Thread, StoppableThread):
 

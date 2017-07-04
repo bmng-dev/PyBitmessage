@@ -1,7 +1,9 @@
 import hashlib
-from struct import pack, unpack
-from pyelliptic import arithmetic
 from binascii import hexlify, unhexlify
+from struct import pack, unpack
+
+from pyelliptic import arithmetic
+
 
 #from debug import logger
 

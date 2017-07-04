@@ -1,6 +1,7 @@
 #!/usr/bin/python2.7
 
 import os
+
 import pkg_resources
 
 dist = pkg_resources.get_distribution('pybitmessage')

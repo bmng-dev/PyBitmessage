@@ -1,5 +1,5 @@
-from os import environ, path
 import sys
+from os import environ, path
 
 # When using py2exe or py2app, the variable frozen is added to the sys
 # namespace.  This can be used to setup a different code path for 

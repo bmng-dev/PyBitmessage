@@ -21,8 +21,10 @@ import logging.config
 import os
 import sys
 import traceback
+
 import helper_startup
 import state
+
 helper_startup.loadConfig()
 
 # Now can be overriden from a config file, which uses standard python logging.config.fileConfig interface

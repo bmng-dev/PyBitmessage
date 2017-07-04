@@ -1,7 +1,9 @@
 from PyQt4 import QtCore, QtGui
-from addaddressdialog import Ui_AddAddressDialog
+
 from addresses import decodeAddress
 from tr import _translate
+
+from addaddressdialog import Ui_AddAddressDialog
 
 
 class AddAddressDialog(QtGui.QDialog):

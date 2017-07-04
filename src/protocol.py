@@ -1,23 +1,24 @@
 import base64
-from binascii import hexlify
 import hashlib
 import random
 import socket
 import ssl
-from struct import pack, unpack, Struct
 import sys
 import time
 import traceback
+from binascii import hexlify
+from struct import Struct, pack, unpack
 
-from addresses import calculateInventoryHash, encodeVarint, decodeVarint, decodeAddress, varintDecodeError
+import defaults
+import highlevelcrypto
+import state
+from addresses import (calculateInventoryHash, decodeAddress, decodeVarint,
+                       encodeVarint, varintDecodeError)
 from bmconfigparser import BMConfigParser
 from debug import logger
-import defaults
 from helper_sql import sqlExecute
-import highlevelcrypto
 from inventory import Inventory
 from queues import objectProcessorQueue
-import state
 from version import softwareVersion
 
 #Service flags

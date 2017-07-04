@@ -3,7 +3,7 @@
 from helper_sql import sqlQuery
 
 try:
-    from PyQt4 import QtCore, QtGui
+    from PyQt4 import QtGui
     haveQt = True
 except:
     haveQt = False

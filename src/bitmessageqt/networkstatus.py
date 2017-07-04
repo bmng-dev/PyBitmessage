@@ -1,14 +1,16 @@
-from PyQt4 import QtCore, QtGui
 import time
-import shared
 
-from tr import _translate
-from inventory import Inventory, PendingDownloadQueue, PendingUpload
+from PyQt4 import QtCore, QtGui
+
 import l10n
+import shared
+import throttle
+from inventory import Inventory, PendingDownloadQueue, PendingUpload
+from tr import _translate
+
+import widgets
 from retranslateui import RetranslateMixin
 from uisignaler import UISignaler
-import widgets
-import throttle
 
 
 class NetworkStatus(QtGui.QWidget, RetranslateMixin):

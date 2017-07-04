@@ -2,9 +2,10 @@ import math
 import threading
 import time
 
+import state
 from bmconfigparser import BMConfigParser
 from singleton import Singleton
-import state
+
 
 class Throttle(object):
     minChunkSize = 4096

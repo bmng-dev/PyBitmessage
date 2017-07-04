@@ -1,32 +1,32 @@
 from __future__ import division
 
 import hashlib
-import threading
-import shared
-import time
-from struct import pack
-from time import strftime, localtime, gmtime
 import random
-from subprocess import call  # used when the API must execute an outside program
-from addresses import calculateInventoryHash, decodeAddress, decodeVarint, encodeVarint
-import highlevelcrypto
-import proofofwork
-import sys
-import tr
-from bmconfigparser import BMConfigParser
-from debug import logger
+import threading
+import time
+from binascii import hexlify, unhexlify
+from struct import pack
+from subprocess import call
+
 import defaults
-from helper_sql import sqlExecute, sqlQuery
 import helper_inbox
-from helper_generic import addDataPadding
 import helper_msgcoding
-from helper_threading import StoppableThread
-from inventory import Inventory, PendingUpload
+import highlevelcrypto
 import l10n
+import proofofwork
 import protocol
 import queues
+import shared
 import state
-from binascii import hexlify, unhexlify
+import tr
+from addresses import (calculateInventoryHash, decodeAddress, decodeVarint,
+                       encodeVarint)
+from bmconfigparser import BMConfigParser
+from debug import logger
+from helper_sql import sqlExecute, sqlQuery
+from helper_threading import StoppableThread
+from inventory import Inventory, PendingUpload
+
 
 # This thread, of which there is only one, does the heavy lifting:
 # calculating POWs.

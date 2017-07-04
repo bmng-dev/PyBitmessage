@@ -1,8 +1,10 @@
 #! python
 
-import sys
 import os
+import sys
+
 import pyelliptic.openssl
+
 
 #Only really old versions of Python don't have sys.hexversion. We don't support
 #them. The logging module was introduced in Python 2.3

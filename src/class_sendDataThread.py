@@ -1,23 +1,20 @@
 import errno
-import time
-import threading
-import Queue
-from struct import unpack, pack
-import hashlib
-import random
 import select
 import socket
-from ssl import SSLError, SSL_ERROR_WANT_WRITE
 import sys
+import threading
+import time
+from ssl import SSL_ERROR_WANT_WRITE, SSLError
+from struct import pack
 
-from helper_generic import addDataPadding
-from class_objectHashHolder import objectHashHolder
-from addresses import encodeVarint
-from debug import logger
-from inventory import PendingUpload
 import protocol
 import state
 import throttle
+from addresses import encodeVarint
+from class_objectHashHolder import objectHashHolder
+from debug import logger
+from inventory import PendingUpload
+
 
 # Every connection to a peer has a sendDataThread (and also a
 # receiveDataThread).

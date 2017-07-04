@@ -1,14 +1,13 @@
 #!/usr/bin/env python2.7
-from struct import pack, unpack
-import time
 import hashlib
-import random
 import os
+import time
+from struct import pack, unpack
 
-from bmconfigparser import BMConfigParser
 import paths
-from state import shutdown
+from bmconfigparser import BMConfigParser
 from debug import logger
+from state import shutdown
 
 libAvailable = True
 ctx = False

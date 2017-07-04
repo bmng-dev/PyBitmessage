@@ -1,7 +1,8 @@
 import collections
-from threading import current_thread, enumerate as threadingEnumerate, RLock
 import Queue
 import time
+from threading import enumerate as threadingEnumerate
+from threading import RLock, current_thread
 
 from helper_sql import SqlBulkExecute, sqlExecute, sqlQuery
 from singleton import Singleton

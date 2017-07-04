@@ -1,4 +1,5 @@
 import Queue
+
 from class_objectProcessorQueue import ObjectProcessorQueue
 
 workerQueue = Queue.Queue()

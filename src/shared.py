@@ -7,29 +7,26 @@ maximumAgeOfNodesThatIAdvertiseToOthers = 10800  # Equals three hours
 useVeryEasyProofOfWorkForTesting = False  # If you set this to True while on the normal network, you won't be able to send or sometimes receive messages.
 
 
-# Libraries.
 import hashlib
 import os
-import sys
 import stat
+import sys
 import threading
 import time
 import traceback
 from binascii import hexlify
 from struct import unpack
 
-# Project imports.
-from addresses import calculateInventoryHash, decodeAddress, decodeVarint, encodeVarint, varintDecodeError
-from bmconfigparser import BMConfigParser
 import highlevelcrypto
-#import helper_startup
+import protocol
+import state
+from addresses import (calculateInventoryHash, decodeAddress, decodeVarint,
+                       encodeVarint, varintDecodeError)
+from bmconfigparser import BMConfigParser
 from helper_sql import sqlExecute, sqlQuery
 from inventory import Inventory
 from pyelliptic import arithmetic
 from queues import objectProcessorQueue
-import protocol
-import state
-
 
 myECCryptorObjects = {}
 MyECSubscriptionCryptorObjects = {}

@@ -3,18 +3,20 @@ import Queue
 import threading
 import time
 
+import protocol
+import shared
+import state
+from bmconfigparser import BMConfigParser
 from class_outgoingSynSender import outgoingSynSender
 from class_sendDataThread import sendDataThread
-from bmconfigparser import BMConfigParser
 from debug import logger
 from helper_sql import sqlQuery, sqlStoredProcedure
 from helper_threading import StoppableThread
-from knownnodes import saveKnownNodes
 from inventory import Inventory
-import protocol
-from queues import addressGeneratorQueue, objectProcessorQueue, UISignalQueue, workerQueue
-import shared
-import state
+from knownnodes import saveKnownNodes
+from queues import (UISignalQueue, addressGeneratorQueue, objectProcessorQueue,
+                    workerQueue)
+
 
 def doCleanShutdown():
     state.shutdown = 1 #Used to tell proof of work worker threads and the objectProcessorThread to exit.

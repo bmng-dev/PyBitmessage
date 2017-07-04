@@ -1,9 +1,11 @@
 import glob
 import os
+
 from PyQt4 import QtCore, QtGui
 
-from bmconfigparser import BMConfigParser
 import paths
+from bmconfigparser import BMConfigParser
+
 
 class LanguageBox(QtGui.QComboBox):
     languageName = {"system": "System Settings", "eo": "Esperanto", "en_pirate": "Pirate English"}

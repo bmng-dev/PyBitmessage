@@ -1,6 +1,7 @@
-from PyQt4 import QtCore, QtGui
-from Queue import Queue
 from time import time
+
+from PyQt4 import QtGui
+
 
 class BMStatusBar(QtGui.QStatusBar):
     duration = 10000

@@ -50,7 +50,7 @@ Return a PIL Image class instance which have generated identicon image.
 """
 
 # we probably don't need all of them, but i don't want to check now
-from PyQt4 import QtCore, QtGui
+from PyQt4 import QtGui
 from PyQt4.QtCore import QPointF, QSize, Qt
 from PyQt4.QtGui import QPainter, QPixmap, QPolygonF
 

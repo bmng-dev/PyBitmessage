@@ -1,7 +1,11 @@
 from binascii import hexlify
-from bmconfigparser import BMConfigParser
+
 import pyelliptic
-from pyelliptic import arithmetic as a, OpenSSL
+from bmconfigparser import BMConfigParser
+from pyelliptic import arithmetic as a
+from pyelliptic import OpenSSL
+
+
 def makeCryptor(privkey):
     private_key = a.changebase(privkey, 16, 256, minlen=32)
     public_key = pointMult(private_key)

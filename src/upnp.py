@@ -1,17 +1,19 @@
 ﻿# A simple upnp module to forward port for BitMessage
 # Reference: http://mattscodecave.com/posts/using-python-and-upnp-to-forward-a-port
 import httplib
-from random import randint
 import socket
-from struct import unpack, pack
 import threading
 import time
-from bmconfigparser import BMConfigParser
-from helper_threading import StoppableThread
+from random import randint
+from struct import unpack
+
 import queues
 import shared
 import state
 import tr
+from bmconfigparser import BMConfigParser
+from helper_threading import StoppableThread
+
 
 def createRequestXML(service, action, arguments=None):
     from xml.dom.minidom import Document

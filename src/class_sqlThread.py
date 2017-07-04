@@ -1,20 +1,21 @@
-import threading
-from bmconfigparser import BMConfigParser
-import sqlite3
-import time
-import shutil  # used for moving the messages.dat file
-import sys
 import os
-from debug import logger
+import random
+import shutil
+import sqlite3
+import sys
+import threading
+import time
+
 import defaults
 import helper_sql
-from namecoin import ensureNamecoinOptions
 import paths
 import queues
-import random
 import state
-import string
-import tr#anslate
+import tr
+from bmconfigparser import BMConfigParser
+from debug import logger
+from namecoin import ensureNamecoinOptions
+
 
 # This thread exists because SQLITE3 is so un-threadsafe that we must
 # submit queries to it and it puts results back in a different queue. They

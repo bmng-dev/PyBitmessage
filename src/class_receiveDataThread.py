@@ -3,41 +3,38 @@ doTimingAttackMitigation = False
 import base64
 import datetime
 import errno
-import math
-import time
-import threading
-import shared
 import hashlib
+import math
 import os
 import Queue
+import random
 import select
 import socket
-import random
 import ssl
-from struct import unpack, pack
 import sys
+import threading
+import time
 import traceback
 from binascii import hexlify
-#import string
-#from subprocess import call  # used when the API must execute an outside program
-#from pyelliptic.openssl import OpenSSL
+from struct import pack, unpack
 
-#import highlevelcrypto
-from addresses import calculateInventoryHash, decodeVarint, encodeVarint, varintDecodeError
-from bmconfigparser import BMConfigParser
-from class_objectHashHolder import objectHashHolder
-from helper_generic import addDataPadding, isHostInPrivateIPRange
-from helper_sql import sqlQuery
 import knownnodes
-from debug import logger
 import paths
 import protocol
-from inventory import Inventory, PendingDownloadQueue, PendingUpload
 import queues
+import shared
 import state
 import throttle
 import tr
+from addresses import (calculateInventoryHash, decodeVarint, encodeVarint,
+                       varintDecodeError)
+from bmconfigparser import BMConfigParser
+from class_objectHashHolder import objectHashHolder
+from debug import logger
+from helper_generic import isHostInPrivateIPRange
+from inventory import Inventory, PendingDownloadQueue, PendingUpload
 from version import softwareVersion
+
 
 # This thread is created either by the synSenderThread(for outgoing
 # connections) or the singleListenerThread(for incoming connections).

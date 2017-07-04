@@ -8,13 +8,15 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt4 import QtCore, QtGui
+
 from bmconfigparser import BMConfigParser
-from foldertree import AddressBookCompleter
-from messageview import MessageView
-from messagecompose import MessageCompose
+
 import settingsmixin
-from networkstatus import NetworkStatus
 from blacklist import Blacklist
+from foldertree import AddressBookCompleter
+from messagecompose import MessageCompose
+from messageview import MessageView
+from networkstatus import NetworkStatus
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
