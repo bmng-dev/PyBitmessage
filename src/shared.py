@@ -1,4 +1,4 @@
-﻿from __future__ import division
+from __future__ import division
 
 verbose = 1
 maximumAgeOfAnObjectThatIAmWillingToAccept = 216000  # This is obsolete with the change to protocol v3 but the singleCleaner thread still hasn't been updated so we need this a little longer.
