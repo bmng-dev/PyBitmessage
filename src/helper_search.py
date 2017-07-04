@@ -1,6 +1,6 @@
 #!/usr/bin/python2.7
 
-from helper_sql import *
+from helper_sql import sqlQuery
 
 try:
     from PyQt4 import QtCore, QtGui

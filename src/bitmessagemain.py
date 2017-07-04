@@ -51,7 +51,7 @@ from bmconfigparser import BMConfigParser
 # Helper Functions
 import helper_bootstrap
 import helper_generic
-from helper_threading import *
+from helper_threading import StoppableThread
 
 
 def connectToStream(streamNumber):

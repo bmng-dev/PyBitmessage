@@ -4,7 +4,7 @@ import queues
 import re
 import sys
 import inspect
-from helper_sql import *
+from helper_sql import sqlExecute, sqlQuery
 from addresses import decodeAddress
 from bmconfigparser import BMConfigParser
 from foldertree import AccountMixin

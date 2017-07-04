@@ -23,7 +23,7 @@ from binascii import hexlify
 #from pyelliptic.openssl import OpenSSL
 
 #import highlevelcrypto
-from addresses import *
+from addresses import calculateInventoryHash, decodeVarint, encodeVarint, varintDecodeError
 from bmconfigparser import BMConfigParser
 from class_objectHashHolder import objectHashHolder
 from helper_generic import addDataPadding, isHostInPrivateIPRange

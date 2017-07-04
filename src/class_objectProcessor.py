@@ -12,14 +12,14 @@ from binascii import hexlify
 
 from pyelliptic.openssl import OpenSSL
 import highlevelcrypto
-from addresses import *
+from addresses import calculateInventoryHash, decodeAddress, decodeVarint, encodeAddress, encodeVarint, varintDecodeError
 from bmconfigparser import BMConfigParser
 import helper_generic
 from helper_generic import addDataPadding
 import helper_inbox
 import helper_msgcoding
 import helper_sent
-from helper_sql import *
+from helper_sql import SqlBulkExecute, sqlExecute, sqlQuery
 import protocol
 import queues
 import state

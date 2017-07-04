@@ -1,6 +1,6 @@
 import pickle
 import socket
-from struct import *
+#from struct import *
 import time
 import random
 import sys

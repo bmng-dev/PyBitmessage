@@ -1,11 +1,14 @@
+import Queue
 import threading
+import time
 import shared
 import socket
 from bmconfigparser import BMConfigParser
-from class_sendDataThread import *
-from class_receiveDataThread import *
+from class_sendDataThread import sendDataThread
+from class_receiveDataThread import receiveDataThread
+from debug import logger
 import helper_bootstrap
-from helper_threading import *
+from helper_threading import StoppableThread
 import protocol
 import errno
 import re

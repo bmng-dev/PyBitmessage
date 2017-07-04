@@ -6,11 +6,11 @@ from pyelliptic.openssl import OpenSSL
 import ctypes
 import hashlib
 import highlevelcrypto
-from addresses import *
+from addresses import decodeAddress, encodeAddress, encodeVarint
 from bmconfigparser import BMConfigParser
 from debug import logger
 import defaults
-from helper_threading import *
+from helper_threading import StoppableThread
 from pyelliptic import arithmetic
 import tr
 from binascii import hexlify

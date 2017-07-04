@@ -7,7 +7,7 @@ from struct import unpack, pack
 import threading
 import time
 from bmconfigparser import BMConfigParser
-from helper_threading import *
+from helper_threading import StoppableThread
 import queues
 import shared
 import state

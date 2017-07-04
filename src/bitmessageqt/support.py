@@ -9,7 +9,7 @@ from bmconfigparser import BMConfigParser
 from debug import logger
 import defaults
 from foldertree import AccountMixin
-from helper_sql import *
+from helper_sql import sqlExecute, sqlQuery
 from l10n import getTranslationLanguage
 from openclpow import openclAvailable, openclEnabled
 import paths

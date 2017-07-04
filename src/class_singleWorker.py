@@ -1,12 +1,14 @@
 from __future__ import division
 
+import hashlib
 import threading
 import shared
 import time
+from struct import pack
 from time import strftime, localtime, gmtime
 import random
 from subprocess import call  # used when the API must execute an outside program
-from addresses import *
+from addresses import calculateInventoryHash, decodeAddress, decodeVarint, encodeVarint
 import highlevelcrypto
 import proofofwork
 import sys
@@ -14,11 +16,11 @@ import tr
 from bmconfigparser import BMConfigParser
 from debug import logger
 import defaults
-from helper_sql import *
+from helper_sql import sqlExecute, sqlQuery
 import helper_inbox
 from helper_generic import addDataPadding
 import helper_msgcoding
-from helper_threading import *
+from helper_threading import StoppableThread
 from inventory import Inventory, PendingUpload
 import l10n
 import protocol

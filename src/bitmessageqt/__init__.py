@@ -12,8 +12,8 @@ except (ImportError, ValueError):
 
 try:
     from PyQt4 import QtCore, QtGui
-    from PyQt4.QtCore import *
-    from PyQt4.QtGui import *
+    from PyQt4.QtCore import QByteArray, QSettings, QString, Qt, QTimer
+    from PyQt4.QtGui import QApplication, QFileDialog, QFont, QIcon, QMenu, QMessageBox, QPainter, QSystemTrayIcon, QTableWidgetItem
     from PyQt4.QtNetwork import QLocalSocket, QLocalServer
 
 except Exception as err:
@@ -27,30 +27,30 @@ try:
 except AttributeError:
     logger.exception('QtGui.QApplication.UnicodeUTF8 error', exc_info=True)
 
-from addresses import *
+from addresses import addBMIfNotPresent, decodeAddress, encodeVarint
 import shared
-from bitmessageui import *
+from bitmessageui import Ui_MainWindow
 from bmconfigparser import BMConfigParser
 import defaults
 from namecoin import namecoinConnection, ensureNamecoinOptions
-from newaddressdialog import *
-from newaddresswizard import *
+from newaddressdialog import Ui_NewAddressDialog
+#from newaddresswizard import Ui_NewAddressWizard
 from messageview import MessageView
-from migrationwizard import *
-from foldertree import *
-from newsubscriptiondialog import *
-from regenerateaddresses import *
-from newchandialog import *
-from safehtmlparser import *
-from specialaddressbehavior import *
-from emailgateway import *
-from settings import *
+from migrationwizard import Ui_MigrationWizard
+from foldertree import AccountMixin, MessageList_AddressWidget, MessageList_SubjectWidget, Ui_AddressBookWidgetItemAddress, Ui_AddressBookWidgetItemLabel, Ui_AddressWidget, Ui_FolderWidget, Ui_SubscriptionWidget
+from newsubscriptiondialog import Ui_NewSubscriptionDialog
+from regenerateaddresses import Ui_regenerateAddressesDialog
+from newchandialog import NewChanDialog
+#from safehtmlparser import *
+from specialaddressbehavior import Ui_SpecialAddressBehaviorDialog
+from emailgateway import Ui_EmailGatewayDialog, Ui_EmailGatewayRegistrationDialog
+from settings import Ui_settingsDialog
 import settingsmixin
 import support
-from about import *
-from help import *
-from iconglossary import *
-from connect import *
+from about import Ui_aboutDialog
+from help import Ui_helpDialog
+from iconglossary import Ui_iconGlossaryDialog
+from connect import Ui_connectDialog
 import locale
 import sys
 from time import strftime, localtime, gmtime
@@ -65,14 +65,14 @@ import random
 import subprocess
 import string
 import datetime
-from helper_sql import *
+from helper_sql import sqlExecute, sqlQuery, sqlStoredProcedure
 import helper_search
 import l10n
 import openclpow
 import types
-from utils import *
+from utils import avatarize, str_broadcast_subscribers
 from collections import OrderedDict
-from account import *
+from account import accountClass, AccountColor, BMAccount, GatewayAccount, getSortedAccounts, getSortedSubscriptions, MailchuckAccount
 from class_objectHashHolder import objectHashHolder
 from class_singleWorker import singleWorker
 from dialogs import AddAddressDialog

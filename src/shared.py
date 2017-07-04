@@ -8,6 +8,7 @@ useVeryEasyProofOfWorkForTesting = False  # If you set this to True while on the
 
 
 # Libraries.
+import hashlib
 import os
 import sys
 import stat
@@ -15,14 +16,16 @@ import threading
 import time
 import traceback
 from binascii import hexlify
+from struct import unpack
 
 # Project imports.
-from addresses import *
+from addresses import calculateInventoryHash, decodeAddress, decodeVarint, encodeVarint, varintDecodeError
 from bmconfigparser import BMConfigParser
 import highlevelcrypto
 #import helper_startup
-from helper_sql import *
+from helper_sql import sqlExecute, sqlQuery
 from inventory import Inventory
+from pyelliptic import arithmetic
 from queues import objectProcessorQueue
 import protocol
 import state

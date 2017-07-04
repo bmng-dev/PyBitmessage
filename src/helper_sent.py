@@ -1,4 +1,4 @@
-from helper_sql import *
+from helper_sql import sqlExecute
 
 def insert(t):
     sqlExecute('''INSERT INTO sent VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''', *t)

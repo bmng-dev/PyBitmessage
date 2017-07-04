@@ -1,6 +1,7 @@
 import errno
 import threading
 import time
+import Queue
 import random
 import shared
 import select
@@ -9,11 +10,13 @@ import socket
 import sys
 import tr
 
-from class_sendDataThread import *
-from class_receiveDataThread import *
+from class_sendDataThread import sendDataThread
+from class_receiveDataThread import receiveDataThread
+from debug import logger
 from bmconfigparser import BMConfigParser
-from helper_threading import *
+from helper_threading import StoppableThread
 import knownnodes
+import protocol
 import queues
 import state
 

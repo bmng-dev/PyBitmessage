@@ -1,4 +1,4 @@
-from helper_sql import *
+from helper_sql import sqlExecute, sqlQuery
 import queues
 
 def insert(t):

@@ -1,5 +1,5 @@
 import hashlib
-from struct import *
+from struct import pack, unpack
 from pyelliptic import arithmetic
 from binascii import hexlify, unhexlify
 

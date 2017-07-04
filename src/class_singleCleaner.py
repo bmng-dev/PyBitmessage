@@ -6,8 +6,8 @@ import os
 
 import tr#anslate
 from bmconfigparser import BMConfigParser
-from helper_sql import *
-from helper_threading import *
+from helper_sql import sqlExecute, sqlQuery
+from helper_threading import StoppableThread
 from inventory import Inventory
 from debug import logger
 import knownnodes

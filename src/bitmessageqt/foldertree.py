@@ -2,8 +2,8 @@ from PyQt4 import QtCore, QtGui
 from string import find, rfind, rstrip, lstrip
 
 from bmconfigparser import BMConfigParser
-from helper_sql import *
-from utils import *
+from helper_sql import sqlExecute, sqlQuery
+from utils import avatarize
 from settingsmixin import SettingsMixin
 
 class AccountMixin (object):

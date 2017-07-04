@@ -11,8 +11,8 @@ from ssl import SSLError, SSL_ERROR_WANT_WRITE
 import sys
 
 from helper_generic import addDataPadding
-from class_objectHashHolder import *
-from addresses import *
+from class_objectHashHolder import objectHashHolder
+from addresses import encodeVarint
 from debug import logger
 from inventory import PendingUpload
 import protocol

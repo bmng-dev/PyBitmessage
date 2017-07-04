@@ -3,7 +3,7 @@ from PyQt4 import QtCore, QtGui
 import multiprocessing
 import Queue
 from urlparse import urlparse
-from safehtmlparser import *
+from safehtmlparser import SafeHTMLParser
 
 class MessageView(QtGui.QTextBrowser):
     MODE_PLAIN = 0
