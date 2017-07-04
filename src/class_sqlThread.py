@@ -289,7 +289,7 @@ class sqlThread(threading.Thread):
             self.cur.execute(item, parameters)
         
         # changes related to protocol v3
-		#    In table inventory and objectprocessorqueue, objecttype is now an integer (it was a human-friendly string previously)
+        #    In table inventory and objectprocessorqueue, objecttype is now an integer (it was a human-friendly string previously)
         item = '''SELECT value FROM settings WHERE key='version';'''
         parameters = ''
         self.cur.execute(item, parameters)

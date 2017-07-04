@@ -107,4 +107,3 @@ if __name__ == "__main__":
     nonce = do_opencl_pow(initialHash.encode("hex"), target)
     trialValue, = unpack('>Q',hashlib.sha512(hashlib.sha512(pack('>Q',nonce) + initialHash).digest()).digest()[0:8])
     print "{} - value {} < {}".format(nonce, trialValue, target)
-	
