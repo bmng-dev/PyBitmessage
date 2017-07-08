@@ -41,8 +41,7 @@ SOURCES = \
     ../regenerateaddresses.py \
     ../safehtmlparser.py \
     ../settings.py \
-    ../specialaddressbehavior.py \
-    ../../plugins/qrcodeui.py
+    ../specialaddressbehavior.py
 
 FORMS = \
     ../blacklist.ui \

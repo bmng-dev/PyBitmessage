@@ -56,11 +56,6 @@ from proofofwork import getPowType
 from pyelliptic.openssl import OpenSSL
 from version import softwareVersion
 
-try:
-    from plugins.plugin import get_plugins
-except ImportError:
-    get_plugins = False
-
 import settingsmixin
 import support
 from about import Ui_aboutDialog
@@ -3754,11 +3749,6 @@ class MyForm(settingsmixin.SMainWindow):
             self.popMenuYourIdentities.addAction(self.actionEmailGateway)
             self.popMenuYourIdentities.addSeparator()
         self.popMenuYourIdentities.addAction(self.actionMarkAllRead)
-
-        if get_plugins:
-            for plugin in get_plugins(
-                    'gui.menu', 'popMenuYourIdentities'):
-                plugin(self)
 
         self.popMenuYourIdentities.exec_(
             self.ui.treeWidgetYourIdentities.mapToGlobal(point))

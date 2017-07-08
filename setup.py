@@ -18,7 +18,6 @@ if __name__ == "__main__":
         url='https://bitmessage.org',
         install_requires=['msgpack-python'],
         extras_require={
-            'qrcode': ['qrcode'],
             'pyopencl': ['pyopencl']
         },
         classifiers=[
@@ -36,7 +35,6 @@ if __name__ == "__main__":
             'pybitmessage.messagetypes',
             'pybitmessage.pyelliptic',
             'pybitmessage.socks',
-            'pybitmessage.plugins'
         ],
         package_data={
             'pybitmessage': ['bitmsghash/*.cl', 'sslkeys/*.pem'],
@@ -51,10 +49,6 @@ if __name__ == "__main__":
         ],
         zip_safe=False,
         entry_points={
-            'gui.menu': [
-                'popMenuYourIdentities.qrcode = '
-                'pybitmessage.plugins.qrcodeui [qrcode]'
-            ],
             #'console_scripts': ['pybitmessage = pybitmessage.bitmessagemain:main'],
         },
         scripts=['src/pybitmessage']
