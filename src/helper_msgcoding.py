@@ -1,11 +1,9 @@
 #!/usr/bin/python2.7
 
-try:
-    import msgpack
-except ImportError:
-    import fallback.umsgpack.umsgpack as msgpack
 import string
 import zlib
+
+import msgpack
 
 import messagetypes
 from bmconfigparser import BMConfigParser
