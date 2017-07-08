@@ -5,7 +5,6 @@ import zlib
 
 import msgpack
 
-import messagetypes
 from bmconfigparser import BMConfigParser
 from debug import logger
 from tr import _translate
@@ -35,9 +34,15 @@ class MsgEncode(object):
             raise ValueError("Unknown encoding %i" % (encoding))
 
     def encodeExtended(self, message):
+        obj = {"": 'message'}
         try:
-            msgObj = messagetypes.message.Message()
-            self.data = zlib.compress(msgpack.dumps(msgObj.encode(message)), 9)
+            obj["subject"] = message["subject"]
+            obj["body"] = message["body"]
+        except KeyError as e:
+            logger.error("Missing key %s", e.name)
+
+        try:
+            self.data = zlib.compress(msgpack.dumps(obj), 9)
         except zlib.error:
             logger.error("Error compressing message")
             raise
@@ -84,28 +89,34 @@ class MsgDecode(object):
             raise DecompressionSizeException(len(tmp))
 
         try:
-            tmp = msgpack.loads(tmp)
+            obj = msgpack.loads(tmp)
         except (msgpack.exceptions.UnpackException,
                 msgpack.exceptions.ExtraData):
             logger.error("Error msgunpacking message")
             raise
 
         try:
-            msgType = tmp[""]
+            msgType = obj[""]
         except KeyError:
             logger.error("Message type missing")
             raise
 
-        msgObj = messagetypes.constructObject(tmp)
-        if msgObj is None:
+        if msgType != 'message':
+            logger.error("Don't know how to handle message type: \"%s\"", msgType)
             raise ValueError("Malformed message")
+
         try:
-            msgObj.process()
-        except:
+            if type(obj["subject"]) is str:
+                self.subject = unicode(obj["subject"], 'utf-8', 'replace')
+            else:
+                self.subject = unicode(str(obj["subject"]), 'utf-8', 'replace')
+            if type(obj["body"]) is str:
+                self.body = unicode(obj["body"], 'utf-8', 'replace')
+            else:
+                self.body = unicode(str(obj["body"]), 'utf-8', 'replace')
+        except KeyError as e:
+            logger.error("Missing mandatory key %s", e)
             raise ValueError("Malformed message")
-        if msgType == "message":
-            self.subject = msgObj.subject
-            self.body = msgObj.body
 
     def decodeSimple(self, data):
         bodyPositionIndex = string.find(data, '\nBody:')

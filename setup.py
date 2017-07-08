@@ -32,7 +32,6 @@ if __name__ == "__main__":
         packages=[
             'pybitmessage',
             'pybitmessage.bitmessageqt',
-            'pybitmessage.messagetypes',
             'pybitmessage.pyelliptic',
             'pybitmessage.socks',
         ],
