@@ -14,7 +14,6 @@ import state
 import tr
 from bmconfigparser import BMConfigParser
 from debug import logger
-from namecoin import ensureNamecoinOptions
 
 
 # This thread exists because SQLITE3 is so un-threadsafe that we must
@@ -182,8 +181,6 @@ class sqlThread(threading.Thread):
         
         if not BMConfigParser().has_option('bitmessagesettings', 'sockslisten'):
             BMConfigParser().set('bitmessagesettings', 'sockslisten', 'false')
-            
-        ensureNamecoinOptions()
             
         """# Add a new column to the inventory table to store the first 20 bytes of encrypted messages to support Android app
         item = '''SELECT value FROM settings WHERE key='version';'''

@@ -16,7 +16,6 @@ SOURCES = \
     ../../helper_msgcoding.py \
     ../../helper_sent.py \
     ../../helper_startup.py \
-    ../../namecoin.py \
     ../../proofofwork.py \
     ../../shared.py \
     ../../upnp.py \

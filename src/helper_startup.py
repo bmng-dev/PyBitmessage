@@ -9,7 +9,6 @@ import defaults
 import paths
 import state
 from bmconfigparser import BMConfigParser
-from namecoin import ensureNamecoinOptions
 
 storeConfigFilesInSameDirectoryAsProgramByDefault = False  # The user may de-select Portable Mode in the settings if they want the config files to stay in the application data folder.
 
@@ -122,8 +121,6 @@ def loadConfig():
         # the first time. But you must also add it to the keys.dat file of
         # existing users. To do that, search the class_sqlThread.py file for the
         # text: "right above this line!"
-
-        ensureNamecoinOptions()
 
         if storeConfigFilesInSameDirectoryAsProgramByDefault:
             # Just use the same directory as the program and forget about
