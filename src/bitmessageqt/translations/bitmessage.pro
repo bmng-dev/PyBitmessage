@@ -26,7 +26,6 @@ SOURCES = \
     ../bitmessageui.py \
     ../blacklist.py \
     ../connect.py \
-    ../emailgateway.py \
     ../foldertree.py \
     ../help.py \
     ../iconglossary.py \

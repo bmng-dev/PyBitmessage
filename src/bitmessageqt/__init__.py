@@ -3,8 +3,6 @@ import hashlib
 import locale
 import os
 import platform
-import random
-import string
 import subprocess
 import sys
 import textwrap
@@ -58,13 +56,11 @@ from version import softwareVersion
 import settingsmixin
 import support
 from about import Ui_aboutDialog
-from account import (AccountColor, BMAccount, GatewayAccount, MailchuckAccount,
-                     accountClass, getSortedAccounts, getSortedSubscriptions)
+from account import (AccountColor, BMAccount, accountClass, getSortedAccounts,
+                     getSortedSubscriptions)
 from bitmessageui import Ui_MainWindow
 from connect import Ui_connectDialog
 from dialogs import AddAddressDialog
-from emailgateway import (Ui_EmailGatewayDialog,
-                          Ui_EmailGatewayRegistrationDialog)
 from foldertree import (AccountMixin, MessageList_AddressWidget,
                         MessageList_SubjectWidget,
                         Ui_AddressBookWidgetItemAddress,
@@ -268,10 +264,6 @@ class MyForm(settingsmixin.SMainWindow):
             _translate(
                 "MainWindow", "Special address behavior..."),
             self.on_action_SpecialAddressBehaviorDialog)
-        self.actionEmailGateway = self.ui.addressContextMenuToolbarYourIdentities.addAction(
-            _translate(
-                "MainWindow", "Email gateway"),
-            self.on_action_EmailGatewayDialog)
         self.actionMarkAllRead = self.ui.addressContextMenuToolbarYourIdentities.addAction(
             _translate(
                 "MainWindow", "Mark all messages as read"),
@@ -1942,25 +1934,6 @@ class MyForm(settingsmixin.SMainWindow):
                     # label plus address
                     if "<" in toAddress and ">" in toAddress:
                         toAddress = toAddress.split('<')[1].split('>')[0]
-                    # email address
-                    elif toAddress.find("@") >= 0:
-                        if isinstance(acct, GatewayAccount):
-                            acct.createMessage(toAddress, fromAddress, subject, message)
-                            subject = acct.subject
-                            toAddress = acct.toAddress
-                        else:
-                            email = acct.getLabel()
-                            if email[-14:] != "@mailchuck.com": #attempt register
-                                # 12 character random email address
-                                email = ''.join(random.SystemRandom().choice(string.ascii_lowercase) for _ in range(12)) + "@mailchuck.com"
-                            acct = MailchuckAccount(fromAddress)
-                            acct.register(email)
-                            BMConfigParser().set(fromAddress, 'label', email)
-                            BMConfigParser().set(fromAddress, 'gateway', 'mailchuck')
-                            BMConfigParser().save()
-                            self.statusBar().showMessage(_translate(
-                                "MainWindow", "Error: Your account wasn't registered at an email gateway. Sending registration now as %1, please wait for the registration to be processed before retrying sending.").arg(email), 10000)
-                            return
                     status, addressVersionNumber, streamNumber, ripe = decodeAddress(
                         toAddress)
                     if status != 'success':
@@ -2216,20 +2189,6 @@ class MyForm(settingsmixin.SMainWindow):
         if self.getCurrentAccount() is not None and ((self.getCurrentFolder(treeWidget) != "inbox" and self.getCurrentFolder(treeWidget) is not None) or self.getCurrentAccount(treeWidget) != acct.address):
             # Ubuntu should notify of new message irespective of whether it's in current message list or not
             self.ubuntuMessagingMenuUpdate(True, None, acct.toLabel)
-        if hasattr(acct, "feedback") and acct.feedback != GatewayAccount.ALL_OK:
-            if acct.feedback == GatewayAccount.REGISTRATION_DENIED:
-                self.dialog = EmailGatewayRegistrationDialog(self, _translate("EmailGatewayRegistrationDialog", "Registration failed:"), 
-                    _translate("EmailGatewayRegistrationDialog", "The requested email address is not available, please try a new one. Fill out the new desired email address (including @mailchuck.com) below:")
-                    )
-                if self.dialog.exec_():
-                    email = str(self.dialog.ui.lineEditEmail.text().toUtf8())
-                    # register resets address variables
-                    acct.register(email)
-                    BMConfigParser().set(acct.fromAddress, 'label', email)
-                    BMConfigParser().set(acct.fromAddress, 'gateway', 'mailchuck')
-                    BMConfigParser().save()
-                    self.statusBar().showMessage(_translate(
-                        "MainWindow", "Sending email gateway registration request"), 10000)
 
     def click_pushButtonAddAddressBook(self):
         self.AddAddressDialogInstance = AddAddressDialog(self)
@@ -2545,54 +2504,6 @@ class MyForm(settingsmixin.SMainWindow):
             self.rerenderComboBoxSendFromBroadcast()
             BMConfigParser().save()
             self.rerenderMessagelistToLabels()
-
-    def on_action_EmailGatewayDialog(self):
-        self.dialog = EmailGatewayDialog(self)
-        # For Modal dialogs
-        if self.dialog.exec_():
-            addressAtCurrentRow = self.getCurrentAccount()
-            acct = accountClass(addressAtCurrentRow)
-            # no chans / mailinglists
-            if acct.type != AccountMixin.NORMAL:
-                return
-            if self.dialog.ui.radioButtonUnregister.isChecked() and isinstance(acct, GatewayAccount):
-                acct.unregister()
-                BMConfigParser().remove_option(addressAtCurrentRow, 'gateway')
-                BMConfigParser().save()
-                self.statusBar().showMessage(_translate(
-                     "MainWindow", "Sending email gateway unregistration request"), 10000)
-            elif self.dialog.ui.radioButtonStatus.isChecked() and isinstance(acct, GatewayAccount):
-                acct.status()
-                self.statusBar().showMessage(_translate(
-                     "MainWindow", "Sending email gateway status request"), 10000)
-            elif self.dialog.ui.radioButtonSettings.isChecked() and isinstance(acct, GatewayAccount):
-                acct.settings()
-                listOfAddressesInComboBoxSendFrom = [str(self.ui.comboBoxSendFrom.itemData(i).toPyObject()) for i in range(self.ui.comboBoxSendFrom.count())]
-                if acct.fromAddress in listOfAddressesInComboBoxSendFrom:
-                    currentIndex = listOfAddressesInComboBoxSendFrom.index(acct.fromAddress)
-                    self.ui.comboBoxSendFrom.setCurrentIndex(currentIndex)
-                else:
-                    self.ui.comboBoxSendFrom.setCurrentIndex(0)
-                self.ui.lineEditTo.setText(acct.toAddress)
-                self.ui.lineEditSubject.setText(acct.subject)
-                self.ui.textEditMessage.setText(acct.message)
-                self.ui.tabWidgetSend.setCurrentIndex(0)
-                self.ui.tabWidget.setCurrentIndex(1)
-                self.ui.textEditMessage.setFocus()
-            elif self.dialog.ui.radioButtonRegister.isChecked():
-                email = str(self.dialog.ui.lineEditEmail.text().toUtf8())
-                acct = MailchuckAccount(addressAtCurrentRow)
-                acct.register(email)
-                BMConfigParser().set(addressAtCurrentRow, 'label', email)
-                BMConfigParser().set(addressAtCurrentRow, 'gateway', 'mailchuck')
-                BMConfigParser().save()
-                self.statusBar().showMessage(_translate(
-                     "MainWindow", "Sending email gateway registration request"), 10000)
-            else:
-                pass
-                #print "well nothing"
-#            shared.writeKeysFile()
-#            self.rerenderInboxToLabels()
 
     def on_action_MarkAllRead(self):
         def partialUpdate(folder, msgids):
@@ -2981,8 +2892,7 @@ class MyForm(settingsmixin.SMainWindow):
                 }
                 self.ui.tabWidgetSend.setCurrentIndex(1)
                 toAddressAtCurrentInboxRow = fromAddressAtCurrentInboxRow
-        if fromAddressAtCurrentInboxRow == tableWidget.item(currentInboxRow, 1).label or (
-            isinstance(acct, GatewayAccount) and fromAddressAtCurrentInboxRow == acct.relayAddress):
+        if fromAddressAtCurrentInboxRow == tableWidget.item(currentInboxRow, 1).label:
             self.ui.lineEditTo.setText(str(acct.fromAddress))
         else:
             self.ui.lineEditTo.setText(tableWidget.item(currentInboxRow, 1).label + " <" + str(acct.fromAddress) + ">")
@@ -3593,12 +3503,7 @@ class MyForm(settingsmixin.SMainWindow):
             myAddress = tableWidget.item(currentRow, 0).data(Qt.UserRole)
             otherAddress = tableWidget.item(currentRow, 1).data(Qt.UserRole)
         account = accountClass(myAddress)
-        if isinstance(account, GatewayAccount) and otherAddress == account.relayAddress and (
-            (currentColumn in [0, 2] and self.getCurrentFolder() == "sent") or
-            (currentColumn in [1, 2] and self.getCurrentFolder() != "sent")):
-            text = str(tableWidget.item(currentRow, currentColumn).label)
-        else:
-            text = tableWidget.item(currentRow, currentColumn).data(Qt.UserRole)
+        text = tableWidget.item(currentRow, currentColumn).data(Qt.UserRole)
         text = unicode(str(text), 'utf-8', 'ignore')
         clipboard = QtGui.QApplication.clipboard()
         clipboard.setText(text)
@@ -3701,7 +3606,6 @@ class MyForm(settingsmixin.SMainWindow):
                 self.popMenuYourIdentities.addAction(self.actionEnableYourIdentities)
             self.popMenuYourIdentities.addAction(self.actionSetAvatarYourIdentities)
             self.popMenuYourIdentities.addAction(self.actionSpecialAddressBehaviorYourIdentities)
-            self.popMenuYourIdentities.addAction(self.actionEmailGateway)
             self.popMenuYourIdentities.addSeparator()
         self.popMenuYourIdentities.addAction(self.actionMarkAllRead)
 
@@ -4187,43 +4091,6 @@ class SpecialAddressBehaviorDialog(QtGui.QDialog):
             self.ui.radioButtonBehaviorMailingList.setDisabled(True)
             self.ui.lineEditMailingListName.setText(_translate(
                 "MainWindow", "This is a chan address. You cannot use it as a pseudo-mailing list."))
-
-        QtGui.QWidget.resize(self, QtGui.QWidget.sizeHint(self))
-
-class EmailGatewayDialog(QtGui.QDialog):
-
-    def __init__(self, parent):
-        QtGui.QWidget.__init__(self, parent)
-        self.ui = Ui_EmailGatewayDialog()
-        self.ui.setupUi(self)
-        self.parent = parent
-        addressAtCurrentRow = parent.getCurrentAccount()
-        acct = accountClass(addressAtCurrentRow)
-        if isinstance(acct, GatewayAccount):
-            self.ui.radioButtonUnregister.setEnabled(True)
-            self.ui.radioButtonStatus.setEnabled(True)
-            self.ui.radioButtonStatus.setChecked(True)
-            self.ui.radioButtonSettings.setEnabled(True)
-        else:
-            self.ui.radioButtonStatus.setEnabled(False)
-            self.ui.radioButtonSettings.setEnabled(False)
-            self.ui.radioButtonUnregister.setEnabled(False)
-        label = BMConfigParser().get(addressAtCurrentRow, 'label')
-        if label.find("@mailchuck.com") > -1:
-            self.ui.lineEditEmail.setText(label)
-
-        QtGui.QWidget.resize(self, QtGui.QWidget.sizeHint(self))
-
-
-class EmailGatewayRegistrationDialog(QtGui.QDialog):
-
-    def __init__(self, parent, title, label):
-        QtGui.QWidget.__init__(self, parent)
-        self.ui = Ui_EmailGatewayRegistrationDialog()
-        self.ui.setupUi(self)
-        self.parent = parent
-        self.setWindowTitle(title)
-        self.ui.label.setText(label)
 
         QtGui.QWidget.resize(self, QtGui.QWidget.sizeHint(self))
 
