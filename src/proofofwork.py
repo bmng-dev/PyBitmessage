@@ -164,9 +164,6 @@ def notifyBuild(tried=False):
 def buildCPoW():
     if bmpow is not None:
         return
-    if paths.frozen is not None:
-        notifyBuild(False)
-        return
     if sys.platform in ["win32", "win64"]:
         notifyBuild(False)
         return
@@ -208,19 +205,14 @@ def run(target, initialHash):
             raise
         except:
             pass # fallback
-    if paths.frozen == "macosx_app" or not paths.frozen:
-        # on my (Peter Surda) Windows 10, Windows Defender
-        # does not like this and fights with PyBitmessage
-        # over CPU, resulting in very slow PoW
-        # added on 2015-11-29: multiprocesing.freeze_support() doesn't help
-        try:
-            return _doFastPoW(target, initialHash)
-        except StopIteration:
-            logger.error("Fast PoW got StopIteration")
-            raise
-        except:
-            logger.error("Fast PoW got exception:", exc_info=True)
-            pass #fallback
+    try:
+        return _doFastPoW(target, initialHash)
+    except StopIteration:
+        logger.error("Fast PoW got StopIteration")
+        raise
+    except:
+        logger.error("Fast PoW got exception:", exc_info=True)
+        pass #fallback
     try:
         return _doSafePoW(target, initialHash)
     except StopIteration:

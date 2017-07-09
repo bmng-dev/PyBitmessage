@@ -500,33 +500,6 @@ def loadOpenSSL():
     from ctypes.util import find_library
     
     libdir = []
-    if getattr(sys,'frozen', None):
-        if 'darwin' in sys.platform:
-            libdir.extend([
-                path.join(environ['RESOURCEPATH'], '..', 'Frameworks','libcrypto.dylib'),
-                path.join(environ['RESOURCEPATH'], '..', 'Frameworks','libcrypto.1.1.0.dylib'),
-                path.join(environ['RESOURCEPATH'], '..', 'Frameworks','libcrypto.1.0.2.dylib'),
-                path.join(environ['RESOURCEPATH'], '..', 'Frameworks','libcrypto.1.0.1.dylib'),
-                path.join(environ['RESOURCEPATH'], '..', 'Frameworks','libcrypto.1.0.0.dylib'),
-                path.join(environ['RESOURCEPATH'], '..', 'Frameworks','libcrypto.0.9.8.dylib'),
-                ])
-        elif 'win32' in sys.platform or 'win64' in sys.platform:
-            libdir.append(path.join(sys._MEIPASS, 'libeay32.dll'))
-        else:
-            libdir.extend([
-                path.join(sys._MEIPASS, 'libcrypto.so'),
-                path.join(sys._MEIPASS, 'libssl.so'),
-                path.join(sys._MEIPASS, 'libcrypto.so.1.1.0'),
-                path.join(sys._MEIPASS, 'libssl.so.1.1.0'),
-                path.join(sys._MEIPASS, 'libcrypto.so.1.0.2'),
-                path.join(sys._MEIPASS, 'libssl.so.1.0.2'),
-                path.join(sys._MEIPASS, 'libcrypto.so.1.0.1'),
-                path.join(sys._MEIPASS, 'libssl.so.1.0.1'),
-                path.join(sys._MEIPASS, 'libcrypto.so.1.0.0'),
-                path.join(sys._MEIPASS, 'libssl.so.1.0.0'),
-                path.join(sys._MEIPASS, 'libcrypto.so.0.9.8'),
-                path.join(sys._MEIPASS, 'libssl.so.0.9.8'),
-            ])
     if 'darwin' in sys.platform:
         libdir.extend(['libcrypto.dylib', '/usr/local/opt/openssl/lib/libcrypto.dylib'])
     elif 'win32' in sys.platform or 'win64' in sys.platform:

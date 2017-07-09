@@ -1,19 +1,8 @@
 import sys
 from os import environ, path
 
-# When using py2exe or py2app, the variable frozen is added to the sys
-# namespace.  This can be used to setup a different code path for 
-# binary distributions vs source distributions.
-frozen = getattr(sys,'frozen', None)
-
 def lookupExeFolder():
-    if frozen:
-        if frozen == "macosx_app":
-            # targetdir/Bitmessage.app/Contents/MacOS/Bitmessage
-            exeFolder = path.dirname(path.dirname(path.dirname(path.dirname(sys.executable)))) + path.sep
-        else:
-            exeFolder = path.dirname(sys.executable) + path.sep
-    elif __file__:
+    if __file__:
         exeFolder = path.dirname(__file__) + path.sep
     else:
         exeFolder = ''
@@ -60,13 +49,7 @@ def lookupAppdataFolder():
     return dataFolder
     
 def codePath():
-    if frozen == "macosx_app":
-        codePath = environ.get("RESOURCEPATH")
-    elif frozen: # windows
-        codePath = sys._MEIPASS
-    else:    
-        codePath = path.dirname(__file__)
-    return codePath
+    return path.dirname(__file__)
 
 def tail(f, lines=20):
     total_lines_wanted = lines

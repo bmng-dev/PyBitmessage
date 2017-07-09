@@ -43,7 +43,6 @@ Operating system: {}
 Architecture: {}bit
 Python Version: {}
 OpenSSL Version: {}
-Frozen: {}
 Portable mode: {}
 C PoW: {}
 OpenCL PoW: {}
@@ -108,9 +107,6 @@ def createSupportMessage(myapp):
     
     opensslversion = "%s (Python internal), %s (external for PyElliptic)" % (ssl.OPENSSL_VERSION, OpenSSL._version)
 
-    frozen = "N/A"
-    if paths.frozen:
-        frozen = paths.frozen
     portablemode = "True" if state.appdata == paths.lookupExeFolder() else "False"
     cpow = "True" if bmpow else "False"
     #cpow = QtGui.QApplication.translate("Support", cpow)
@@ -127,7 +123,7 @@ def createSupportMessage(myapp):
         upnp = "N/A"
     connectedhosts = len(shared.connectedHostsList)
 
-    myapp.ui.textEditMessage.setText(str(QtGui.QApplication.translate("Support", SUPPORT_MESSAGE)).format(version, os, architecture, pythonversion, opensslversion, frozen, portablemode, cpow, openclpow, locale, socks, upnp, connectedhosts))
+    myapp.ui.textEditMessage.setText(str(QtGui.QApplication.translate("Support", SUPPORT_MESSAGE)).format(version, os, architecture, pythonversion, opensslversion, portablemode, cpow, openclpow, locale, socks, upnp, connectedhosts))
 
     # single msg tab
     myapp.ui.tabWidgetSend.setCurrentIndex(0)
