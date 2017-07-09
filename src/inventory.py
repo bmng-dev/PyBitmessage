@@ -61,7 +61,10 @@ class Inventory(collections.MutableMapping):
 
     def hashes_by_stream(self, stream):
         with self.lock:
-            return self._streams[stream]
+            s = self._streams[stream]
+            if not s:
+                s.update((inv_vector for inv_vector, in sqlQuery('SELECT hash FROM inventory WHERE streamnumber=? AND expirestime>?', stream, int(time.time()) - 3600)))
+            return s
 
     def unexpired_hashes_by_stream(self, stream):
         with self.lock:
