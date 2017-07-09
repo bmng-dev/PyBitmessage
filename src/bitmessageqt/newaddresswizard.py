@@ -1,4 +1,3 @@
-#!/usr/bin/env python2.7
 from PyQt4 import QtCore, QtGui
 
 class NewAddressWizardIntroPage(QtGui.QWizardPage):
@@ -338,17 +337,3 @@ class NewAddressThread(QtCore.QThread):
             self.emit(self.signal, i)
         self.emit(self.signal, 101)
 #        self.terminate()
-
-if __name__ == '__main__':
-
-    import sys
-
-    app = QtGui.QApplication(sys.argv)
-
-    wizard = Ui_NewAddressWizard(["a", "b", "c", "d"])
-    if (wizard.exec_()):
-        print "Email: " + ("yes" if wizard.field("emailAsWell").toBool() else "no")
-        print "BM: " + ("yes" if wizard.field("onlyBM").toBool() else "no")
-    else:
-        print "Wizard cancelled"
-    sys.exit()

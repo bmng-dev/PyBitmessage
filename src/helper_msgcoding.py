@@ -1,5 +1,3 @@
-#!/usr/bin/python2.7
-
 import string
 import zlib
 
@@ -134,24 +132,3 @@ class MsgDecode(object):
             subject = subject.splitlines()[0]
         self.subject = subject
         self.body = body
-
-if __name__ == '__main__':
-    import random
-    messageData = {
-        "subject": ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(40)),
-        "body": ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(10000))
-    }
-    obj1 = MsgEncode(messageData, 1)
-    obj2 = MsgEncode(messageData, 2)
-    obj3 = MsgEncode(messageData, 3)
-    print "1:%i 2:%i 3:%i" %(len(obj1.data), len(obj2.data), len(obj3.data))
-
-    obj1e = MsgDecode(1, obj1.data)
-    # no subject in trivial encoding
-    assert messageData["body"] == obj1e.body
-    obj2e = MsgDecode(2, obj2.data)
-    assert messageData["subject"] == obj2e.subject
-    assert messageData["body"] == obj2e.body
-    obj3e = MsgDecode(3, obj3.data)
-    assert messageData["subject"] == obj3e.subject
-    assert messageData["body"] == obj3e.body

@@ -1,7 +1,5 @@
 import pickle
-import sys
 import time
-from time import localtime, strftime
 
 import state
 
@@ -42,40 +40,3 @@ def createDefaultKnownNodes(appdata):
         pickle.dump(allKnownNodes, output)
 
     return allKnownNodes
-
-def readDefaultKnownNodes(appdata):
-    pickleFile = open(appdata + 'knownnodes.dat', 'rb')
-    knownNodes = pickle.load(pickleFile)
-    pickleFile.close()
-    for stream, storedValue in knownNodes.items():
-        for host,value in storedValue.items():
-            try:
-                # Old knownNodes format.
-                port, storedtime = value
-            except:
-                # New knownNodes format.
-                host, port = host
-                storedtime = value
-            print host, '\t', port, '\t', unicode(strftime('%a, %d %b %Y  %I:%M %p',localtime(storedtime)),'utf-8')
-
-if __name__ == "__main__":
-
-    APPNAME = "PyBitmessage"
-    from os import path, environ
-    if sys.platform == 'darwin':
-        from AppKit import NSSearchPathForDirectoriesInDomains  # @UnresolvedImport
-        # http://developer.apple.com/DOCUMENTATION/Cocoa/Reference/Foundation/Miscellaneous/Foundation_Functions/Reference/reference.html#//apple_ref/c/func/NSSearchPathForDirectoriesInDomains
-        # NSApplicationSupportDirectory = 14
-        # NSUserDomainMask = 1
-        # True for expanding the tilde into a fully qualified path
-        appdata = path.join(NSSearchPathForDirectoriesInDomains(14, 1, True)[0], APPNAME) + '/'
-    elif 'win' in sys.platform:
-        appdata = path.join(environ['APPDATA'], APPNAME) + '\\'
-    else:
-        appdata = path.expanduser(path.join("~", "." + APPNAME + "/"))
-
-
-    print 'New list of all known nodes:', createDefaultKnownNodes(appdata)
-    readDefaultKnownNodes(appdata)
-
-

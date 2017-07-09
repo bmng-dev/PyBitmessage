@@ -745,14 +745,3 @@ class Ui_MainWindow(object):
         self.actionJoinChan.setText(_translate("MainWindow", "Join / Create chan", None))
 
 import bitmessage_icons_rc
-
-if __name__ == "__main__":
-    import sys
-    
-    app = QtGui.QApplication(sys.argv)
-    MainWindow = settingsmixin.SMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())
-

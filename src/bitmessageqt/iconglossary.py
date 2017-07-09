@@ -86,13 +86,3 @@ class Ui_iconGlossaryDialog(object):
         self.label_6.setText(_translate("iconGlossaryDialog", "You do have connections with other peers and your firewall is correctly configured.", None))
 
 import bitmessage_icons_rc
-
-if __name__ == "__main__":
-    import sys
-    app = QtGui.QApplication(sys.argv)
-    iconGlossaryDialog = QtGui.QDialog()
-    ui = Ui_iconGlossaryDialog()
-    ui.setupUi(iconGlossaryDialog)
-    iconGlossaryDialog.show()
-    sys.exit(app.exec_())
-
