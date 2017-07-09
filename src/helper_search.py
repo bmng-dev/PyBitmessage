@@ -1,5 +1,3 @@
-#!/usr/bin/python2.7
-
 from helper_sql import sqlQuery
 
 try:

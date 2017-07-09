@@ -1,5 +1,3 @@
-#!/usr/bin/python2.7
-
 from PyQt4 import QtCore, QtGui
 
 class SettingsMixin(object):
