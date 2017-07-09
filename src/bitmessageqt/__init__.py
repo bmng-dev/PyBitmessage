@@ -69,9 +69,7 @@ from foldertree import (AccountMixin, MessageList_AddressWidget,
 from help import Ui_helpDialog
 from iconglossary import Ui_iconGlossaryDialog
 from messageview import MessageView
-from migrationwizard import Ui_MigrationWizard
 from newaddressdialog import Ui_NewAddressDialog
-#from newaddresswizard import Ui_NewAddressWizard
 from newchandialog import NewChanDialog
 from newsubscriptiondialog import Ui_NewSubscriptionDialog
 from regenerateaddresses import Ui_regenerateAddressesDialog
@@ -1591,13 +1589,6 @@ class MyForm(settingsmixin.SMainWindow):
                 BMConfigParser().save()
             else:
                 self.click_actionSettings()
-
-    def showMigrationWizard(self, level):
-        self.migrationWizardInstance = Ui_MigrationWizard(["a"])
-        if self.migrationWizardInstance.exec_():
-            pass
-        else:
-            pass
         
     def changeEvent(self, event):
         if event.type() == QtCore.QEvent.LanguageChange:
@@ -2553,11 +2544,6 @@ class MyForm(settingsmixin.SMainWindow):
         addresses = []
         for addressInKeysFile in getSortedAccounts():
             addresses.append(addressInKeysFile)
-#        self.dialog = Ui_NewAddressWizard(addresses)
-#        self.dialog.exec_()
-#        print "Name: " + self.dialog.field("name").toString()
-#        print "Email: " + self.dialog.field("email").toString()
-#        return
         self.dialog = NewAddressDialog(self)
         # For Modal dialogs
         if self.dialog.exec_():
@@ -4268,14 +4254,8 @@ def run():
         'bitmessagesettings', 'dontconnect')
     if myapp._firstrun:
         myapp.showConnectDialog()  # ask the user if we may connect
-
-#    try:
-#        if BMConfigParser().get('bitmessagesettings', 'mailchuck') < 1:
-#            myapp.showMigrationWizard(BMConfigParser().get('bitmessagesettings', 'mailchuck'))
-#    except:
-#        myapp.showMigrationWizard(0)
     
-    # only show after wizards and connect dialogs have completed
+    # only show after connect dialog has completed
     if not BMConfigParser().getboolean('bitmessagesettings', 'startintray'):
         myapp.show()
 
