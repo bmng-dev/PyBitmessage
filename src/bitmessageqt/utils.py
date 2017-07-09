@@ -7,6 +7,8 @@ import state
 from addresses import addBMIfNotPresent
 from bmconfigparser import BMConfigParser
 
+import qidenticon
+
 str_broadcast_subscribers = '[Broadcast subscribers]'
 str_chan = '[chan]'
 
@@ -31,40 +33,21 @@ def identiconize(address):
     if not BMConfigParser().getboolean('bitmessagesettings', 'useidenticons'):
         idcon = QtGui.QIcon()
         return idcon
-    
-    if (identicon_lib[:len('qidenticon')] == 'qidenticon'):
-        # print identicon_lib
-        # originally by:
-        # :Author:Shin Adachi <shn@glucose.jp>
-        # Licesensed under FreeBSD License.
-        # stripped from PIL and uses QT instead (by sendiulo, same license)
-        import qidenticon
-        hash = hashlib.md5(addBMIfNotPresent(address)+identiconsuffix).hexdigest()
-        use_two_colors = (identicon_lib[:len('qidenticon_two')] == 'qidenticon_two')
-        opacity = int(not((identicon_lib == 'qidenticon_x') | (identicon_lib == 'qidenticon_two_x') | (identicon_lib == 'qidenticon_b') | (identicon_lib == 'qidenticon_two_b')))*255
-        penwidth = 0
-        image = qidenticon.render_identicon(int(hash, 16), size, use_two_colors, opacity, penwidth)
-        # filename = './images/identicons/'+hash+'.png'
-        # image.save(filename)
-        idcon = QtGui.QIcon()
-        idcon.addPixmap(image, QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        return idcon
-    elif identicon_lib == 'pydenticon':
-        # print identicon_lib
-        # Here you could load pydenticon.py (just put it in the "src" folder of your Bitmessage source)
-        from pydenticon import Pydenticon
-        # It is not included in the source, because it is licensed under GPLv3
-        # GPLv3 is a copyleft license that would influence our licensing
-        # Find the source here: http://boottunes.googlecode.com/svn-history/r302/trunk/src/pydenticon.py
-        # note that it requires PIL to be installed: http://www.pythonware.com/products/pil/
-        idcon_render = Pydenticon(addBMIfNotPresent(address)+identiconsuffix, size*3)
-        rendering = idcon_render._render()
-        data = rendering.convert("RGBA").tostring("raw", "RGBA")
-        qim = QImage(data, size, size, QImage.Format_ARGB32)
-        pix = QPixmap.fromImage(qim)
-        idcon = QtGui.QIcon()
-        idcon.addPixmap(pix, QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        return idcon
+
+    # originally by:
+    # :Author:Shin Adachi <shn@glucose.jp>
+    # Licesensed under FreeBSD License.
+    # stripped from PIL and uses QT instead (by sendiulo, same license)
+    hash = hashlib.md5(addBMIfNotPresent(address)+identiconsuffix).hexdigest()
+    use_two_colors = (identicon_lib[:len('qidenticon_two')] == 'qidenticon_two')
+    opacity = int(not((identicon_lib == 'qidenticon_x') | (identicon_lib == 'qidenticon_two_x') | (identicon_lib == 'qidenticon_b') | (identicon_lib == 'qidenticon_two_b')))*255
+    penwidth = 0
+    image = qidenticon.render_identicon(int(hash, 16), size, use_two_colors, opacity, penwidth)
+    # filename = './images/identicons/'+hash+'.png'
+    # image.save(filename)
+    idcon = QtGui.QIcon()
+    idcon.addPixmap(image, QtGui.QIcon.Normal, QtGui.QIcon.Off)
+    return idcon
 
 def avatarize(address):
     """
