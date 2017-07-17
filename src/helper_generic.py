@@ -1,5 +1,4 @@
 import socket
-from binascii import hexlify, unhexlify
 from multiprocessing import current_process
 from threading import current_thread, enumerate
 
@@ -18,19 +17,6 @@ def powQueueSize():
         except:
             pass
     return curWorkerQueue
-
-def convertIntToString(n):
-    a = __builtins__.hex(n)
-    if a[-1:] == 'L':
-        a = a[:-1]
-    if (len(a) % 2) == 0:
-        return unhexlify(a[2:])
-    else:
-        return unhexlify('0' + a[2:])
-
-
-def convertStringToInt(s):
-    return int(hexlify(s), 16)
 
 def signal_handler(signal, frame):
     logger.error("Got signal %i in %s/%s", signal, current_process().name, current_thread().name)
@@ -70,6 +56,3 @@ def isHostInPrivateIPRange(host):
         if host[:3] >= 224 and host[:3] <= 239 and host[4] == '.':
             return True
     return False
-
-def addDataPadding(data, desiredMsgLength = 12, paddingChar = '\x00'):
-    return data + paddingChar * (desiredMsgLength - len(data))
