@@ -3719,8 +3719,7 @@ class aboutDialog(QtGui.QDialog):
         self.ui = Ui_aboutDialog()
         self.ui.setupUi(self)
         self.parent = parent
-        self.ui.label.setText("PyBitmessage " + softwareVersion)
-        self.ui.labelVersion.setText(paths.lastCommit())
+        self.ui.labelVersion.setText(softwareVersion)
 
 
 class regenerateAddressesDialog(QtGui.QDialog):
