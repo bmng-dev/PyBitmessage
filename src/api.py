@@ -4,6 +4,8 @@
 import base64
 import hashlib
 import json
+import socket
+import threading
 import time
 from binascii import hexlify, unhexlify
 from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler, SimpleXMLRPCServer
@@ -22,6 +24,7 @@ from addresses import (addBMIfNotPresent, calculateInventoryHash,
 from bmconfigparser import BMConfigParser
 from debug import logger
 from helper_sql import SqlBulkExecute, sqlExecute, sqlQuery, sqlStoredProcedure
+from helper_threading import StoppableThread
 from inventory import Inventory
 from pyelliptic.openssl import OpenSSL
 from version import softwareVersion
@@ -1043,3 +1046,25 @@ class MySimpleXMLRPCRequestHandler(SimpleXMLRPCRequestHandler):
             return "API Error 0021: Unexpected API Failure - %s" % str(e)
 
 
+# This thread, of which there is only one, runs the API.
+class singleAPI(threading.Thread, StoppableThread):
+    def __init__(self):
+        threading.Thread.__init__(self, name="singleAPI")
+        self.initStop()
+
+    def stopThread(self):
+        super(singleAPI, self).stopThread()
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        try:
+            s.connect((BMConfigParser().get('bitmessagesettings', 'apiinterface'), BMConfigParser().getint(
+                'bitmessagesettings', 'apiport')))
+            s.shutdown(socket.SHUT_RDWR)
+            s.close()
+        except:
+            pass
+
+    def run(self):
+        se = StoppableXMLRPCServer((BMConfigParser().get('bitmessagesettings', 'apiinterface'), BMConfigParser().getint(
+            'bitmessagesettings', 'apiport')), MySimpleXMLRPCRequestHandler, True, True)
+        se.register_introspection_functions()
+        se.serve_forever()

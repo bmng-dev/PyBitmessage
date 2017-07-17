@@ -22,7 +22,6 @@ depends.check_dependencies()
 import ctypes
 import signal  # Used to capture a Ctrl-C keypress so that Bitmessage can shutdown gracefully.
 import socket
-import threading
 from struct import pack
 from subprocess import call
 
@@ -32,7 +31,7 @@ import knownnodes
 import shared
 import shutdown
 import state
-from api import MySimpleXMLRPCRequestHandler, StoppableXMLRPCServer
+from api import singleAPI
 from bmconfigparser import BMConfigParser
 from class_addressGenerator import addressGenerator
 from class_objectProcessor import objectProcessor
@@ -43,7 +42,6 @@ from class_singleWorker import singleWorker
 from class_sqlThread import sqlThread
 from helper_startup import \
     isOurOperatingSystemLimitedToHavingVeryFewHalfOpenConnections
-from helper_threading import StoppableThread
 from singleinstance import singleinstance
 
 import helper_generic
@@ -128,29 +126,6 @@ def _fixWinsock():
         socket.IPPROTO_IPV6 = 41
     if not hasattr(socket, 'IPV6_V6ONLY'):
         socket.IPV6_V6ONLY = 27
-
-# This thread, of which there is only one, runs the API.
-class singleAPI(threading.Thread, StoppableThread):
-    def __init__(self):
-        threading.Thread.__init__(self, name="singleAPI")
-        self.initStop()
-        
-    def stopThread(self):
-        super(singleAPI, self).stopThread()
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        try:
-            s.connect((BMConfigParser().get('bitmessagesettings', 'apiinterface'), BMConfigParser().getint(
-                'bitmessagesettings', 'apiport')))
-            s.shutdown(socket.SHUT_RDWR)
-            s.close()
-        except:
-            pass
-
-    def run(self):
-        se = StoppableXMLRPCServer((BMConfigParser().get('bitmessagesettings', 'apiinterface'), BMConfigParser().getint(
-            'bitmessagesettings', 'apiport')), MySimpleXMLRPCRequestHandler, True, True)
-        se.register_introspection_functions()
-        se.serve_forever()
 
 # This is a list of current connections (the thread pointers at least)
 selfInitiatedConnections = {}
