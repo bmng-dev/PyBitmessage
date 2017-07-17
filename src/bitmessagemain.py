@@ -26,7 +26,6 @@ from struct import pack
 from subprocess import call
 
 import defaults
-import helper_bootstrap
 import knownnodes
 import shared
 import shutdown
@@ -152,7 +151,7 @@ class Main:
 
         self.setSignalHandler()
 
-        helper_bootstrap.knownNodes()
+        knownnodes.loadKnownNodes()
         # Start the address generation thread
         addressGeneratorThread = addressGenerator()
         addressGeneratorThread.daemon = True  # close the main program even if there are threads left

@@ -10,7 +10,6 @@ SOURCES = \
     ../../class_singleListener.py \
     ../../class_singleWorker.py \
     ../../class_sqlThread.py \
-    ../../helper_bootstrap.py \
     ../../helper_generic.py \
     ../../helper_inbox.py \
     ../../helper_msgcoding.py \

@@ -5,7 +5,7 @@ import socket
 import threading
 import time
 
-import helper_bootstrap
+import knownnodes
 import protocol
 import shared
 import state
@@ -75,7 +75,7 @@ class singleListener(threading.Thread, StoppableThread):
 
         while BMConfigParser().safeGetBoolean('bitmessagesettings', 'dontconnect') and state.shutdown == 0:
             self.stop.wait(1)
-        helper_bootstrap.dns()
+        knownnodes.dns()
         # We typically don't want to accept incoming connections if the user is using a
         # SOCKS proxy, unless they have configured otherwise. If they eventually select
         # proxy 'none' or configure SOCKS listening then this will start listening for
