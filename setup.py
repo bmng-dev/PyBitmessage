@@ -47,7 +47,7 @@ setup(
     ],
     zip_safe=False,
     entry_points={
-        #'console_scripts': ['pybitmessage = pybitmessage.bitmessagemain:main'],
+        #'console_scripts': ['pybitmessage = pybitmessage.main:main'],
     },
     scripts=['src/pybitmessage']
 )
