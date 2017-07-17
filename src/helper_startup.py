@@ -10,8 +10,6 @@ import paths
 import state
 from bmconfigparser import BMConfigParser
 
-storeConfigFilesInSameDirectoryAsProgramByDefault = False  # The user may de-select Portable Mode in the settings if they want the config files to stay in the application data folder.
-
 def _loadTrustedPeer():
     try:
         trustedPeer = BMConfigParser().get('bitmessagesettings', 'trustedpeer')
@@ -35,23 +33,16 @@ def loadConfig():
             needToCreateKeysFile = True
 
     else:
-        BMConfigParser().read(paths.lookupExeFolder() + 'keys.dat')
+        # Could not load the keys.dat file in the program directory. Perhaps it
+        # is in the appdata directory.
+        state.appdata = paths.lookupAppdataFolder()
+        BMConfigParser().read(state.appdata + 'keys.dat')
         try:
             BMConfigParser().get('bitmessagesettings', 'settingsversion')
-            print 'Loading config files from same directory as program.'
+            print 'Loading existing config files from', state.appdata
             needToCreateKeysFile = False
-            state.appdata = paths.lookupExeFolder()
         except:
-            # Could not load the keys.dat file in the program directory. Perhaps it
-            # is in the appdata directory.
-            state.appdata = paths.lookupAppdataFolder()
-            BMConfigParser().read(state.appdata + 'keys.dat')
-            try:
-                BMConfigParser().get('bitmessagesettings', 'settingsversion')
-                print 'Loading existing config files from', state.appdata
-                needToCreateKeysFile = False
-            except:
-                needToCreateKeysFile = True
+            needToCreateKeysFile = True
 
     if needToCreateKeysFile:
         # This appears to be the first time running the program; there is
@@ -122,15 +113,9 @@ def loadConfig():
         # existing users. To do that, search the class_sqlThread.py file for the
         # text: "right above this line!"
 
-        if storeConfigFilesInSameDirectoryAsProgramByDefault:
-            # Just use the same directory as the program and forget about
-            # the appdata folder
-            state.appdata = ''
-            print 'Creating new config files in same directory as program.'
-        else:
-            print 'Creating new config files in', state.appdata
-            if not os.path.exists(state.appdata):
-                os.makedirs(state.appdata)
+        print 'Creating new config files in', state.appdata
+        if not os.path.exists(state.appdata):
+            os.makedirs(state.appdata)
         if not sys.platform.startswith('win'):
             os.umask(0o077)
         BMConfigParser().save()

@@ -1,6 +1,5 @@
 import os
 import random
-import shutil
 import sqlite3
 import sys
 import threading
@@ -8,7 +7,6 @@ import time
 
 import defaults
 import helper_sql
-import paths
 import queues
 import state
 import tr
@@ -507,38 +505,6 @@ class sqlThread(threading.Thread):
                 logger.info('sqlThread exiting gracefully.')
 
                 return
-            elif item == 'movemessagstoprog':
-                logger.debug('the sqlThread is moving the messages.dat file to the local program directory.')
-
-                try:
-                    self.conn.commit()
-                except Exception as err:
-                    if str(err) == 'database or disk is full':
-                        logger.fatal('(while movemessagstoprog) Alert: Your disk or data storage volume is full. sqlThread will now exit.')
-                        queues.UISignalQueue.put(('alert', (tr._translate("MainWindow", "Disk full"), tr._translate("MainWindow", 'Alert: Your disk or data storage volume is full. Bitmessage will now exit.'), True)))
-                        os._exit(0)
-                self.conn.close()
-                shutil.move(
-                    paths.lookupAppdataFolder() + 'messages.dat', paths.lookupExeFolder() + 'messages.dat')
-                self.conn = sqlite3.connect(paths.lookupExeFolder() + 'messages.dat')
-                self.conn.text_factory = str
-                self.cur = self.conn.cursor()
-            elif item == 'movemessagstoappdata':
-                logger.debug('the sqlThread is moving the messages.dat file to the Appdata folder.')
-
-                try:
-                    self.conn.commit()
-                except Exception as err:
-                    if str(err) == 'database or disk is full':
-                        logger.fatal('(while movemessagstoappdata) Alert: Your disk or data storage volume is full. sqlThread will now exit.')
-                        queues.UISignalQueue.put(('alert', (tr._translate("MainWindow", "Disk full"), tr._translate("MainWindow", 'Alert: Your disk or data storage volume is full. Bitmessage will now exit.'), True)))
-                        os._exit(0)
-                self.conn.close()
-                shutil.move(
-                    paths.lookupExeFolder() + 'messages.dat', paths.lookupAppdataFolder() + 'messages.dat')
-                self.conn = sqlite3.connect(paths.lookupAppdataFolder() + 'messages.dat')
-                self.conn.text_factory = str
-                self.cur = self.conn.cursor()
             elif item == 'deleteandvacuume':
                 self.cur.execute('''delete from inbox where folder='trash' ''')
                 self.cur.execute('''delete from sent where folder='trash' ''')

@@ -1,13 +1,6 @@
 import sys
 from os import environ, path
 
-def lookupExeFolder():
-    if __file__:
-        exeFolder = path.dirname(__file__) + path.sep
-    else:
-        exeFolder = ''
-    return exeFolder
-
 def lookupAppdataFolder():
     APPNAME = "PyBitmessage"
     if "BITMESSAGE_HOME" in environ:

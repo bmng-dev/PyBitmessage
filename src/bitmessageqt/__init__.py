@@ -29,10 +29,8 @@ except Exception as err:
     logger.critical(logmsg, exc_info=True)
     sys.exit()
 
-import debug
 import defaults
 import helper_search
-import knownnodes
 import l10n
 import openclpow
 import paths
@@ -2310,42 +2308,6 @@ class MyForm(settingsmixin.SMainWindow):
                 # startup for linux
                 pass
 
-            if state.appdata != paths.lookupExeFolder() and self.settingsDialogInstance.ui.checkBoxPortableMode.isChecked():  # If we are NOT using portable mode now but the user selected that we should...
-                # Write the keys.dat file to disk in the new location
-                sqlStoredProcedure('movemessagstoprog')
-                with open(paths.lookupExeFolder() + 'keys.dat', 'wb') as configfile:
-                    BMConfigParser().write(configfile)
-                # Write the knownnodes.dat file to disk in the new location
-                knownnodes.saveKnownNodes(paths.lookupExeFolder())
-                os.remove(state.appdata + 'keys.dat')
-                os.remove(state.appdata + 'knownnodes.dat')
-                previousAppdataLocation = state.appdata
-                state.appdata = paths.lookupExeFolder()
-                debug.restartLoggingInUpdatedAppdataLocation()
-                try:
-                    os.remove(previousAppdataLocation + 'debug.log')
-                    os.remove(previousAppdataLocation + 'debug.log.1')
-                except:
-                    pass
-
-            if state.appdata == paths.lookupExeFolder() and not self.settingsDialogInstance.ui.checkBoxPortableMode.isChecked():  # If we ARE using portable mode now but the user selected that we shouldn't...
-                state.appdata = paths.lookupAppdataFolder()
-                if not os.path.exists(state.appdata):
-                    os.makedirs(state.appdata)
-                sqlStoredProcedure('movemessagstoappdata')
-                # Write the keys.dat file to disk in the new location
-                BMConfigParser().save()
-                # Write the knownnodes.dat file to disk in the new location
-                knownnodes.saveKnownNodes(state.appdata)
-                os.remove(paths.lookupExeFolder() + 'keys.dat')
-                os.remove(paths.lookupExeFolder() + 'knownnodes.dat')
-                debug.restartLoggingInUpdatedAppdataLocation()
-                try:
-                    os.remove(paths.lookupExeFolder() + 'debug.log')
-                    os.remove(paths.lookupExeFolder() + 'debug.log.1')
-                except:
-                    pass
-
     def on_action_SpecialAddressBehaviorDialog(self):
         self.dialog = SpecialAddressBehaviorDialog(self)
         # For Modal dialogs
@@ -3795,16 +3757,6 @@ class settingsDialog(QtGui.QDialog):
             BMConfigParser().safeGetBoolean('bitmessagesettings', 'useidenticons'))
         self.ui.checkBoxReplyBelow.setChecked(
             BMConfigParser().safeGetBoolean('bitmessagesettings', 'replybelow'))
-        
-        if state.appdata == paths.lookupExeFolder():
-            self.ui.checkBoxPortableMode.setChecked(True)
-        else:
-            try:
-                import tempfile
-                file = tempfile.NamedTemporaryFile(dir=paths.lookupExeFolder(), delete=True)
-                file.close # should autodelete
-            except:
-                self.ui.checkBoxPortableMode.setDisabled(True)
 
         if 'darwin' in sys.platform:
             self.ui.checkBoxStartOnLogon.setDisabled(True)

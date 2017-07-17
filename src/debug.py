@@ -108,18 +108,3 @@ if configureLogging():
         logger = logging.getLogger('both')
 else:
     logger = logging.getLogger('default')
-
-def restartLoggingInUpdatedAppdataLocation():
-    global logger
-    for i in list(logger.handlers):
-        logger.removeHandler(i)
-        i.flush()
-        i.close()
-    if configureLogging():
-        if '-c' in sys.argv:
-            logger = logging.getLogger('file_only')
-        else:
-            logger = logging.getLogger('both')
-    else:
-        logger = logging.getLogger('default')
-
