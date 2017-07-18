@@ -702,8 +702,7 @@ class receiveDataThread(threading.Thread):
         nodes = random.sample(nodes, min(len(nodes), MAX_SUBSTREAM_ADDR))
 
         nodes2 = list(iternodes(streams))
-        nodes2_len = len(nodes2)
-        nodes += random.sample(nodes2, min(nodes2_len, MAX_ADDR - nodes2_len))
+        nodes += random.sample(nodes2, min(len(nodes2), MAX_ADDR - len(nodes)))
         nodes = random.sample(nodes, len(nodes))
 
         self.sendDataThreadQueue.put((0, 'sendaddr', nodes))
