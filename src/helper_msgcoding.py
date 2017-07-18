@@ -1,11 +1,14 @@
+import logging
 import string
 import zlib
 
 import msgpack
 
 from bmconfigparser import BMConfigParser
-from debug import logger
 from tr import _translate
+
+
+logger = logging.getLogger(__name__)
 
 BITMESSAGE_ENCODING_IGNORE = 0
 BITMESSAGE_ENCODING_TRIVIAL = 1

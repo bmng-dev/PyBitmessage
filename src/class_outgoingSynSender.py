@@ -1,4 +1,5 @@
 import errno
+import logging
 import Queue
 import random
 import socket
@@ -16,8 +17,10 @@ import tr
 from bmconfigparser import BMConfigParser
 from class_receiveDataThread import receiveDataThread
 from class_sendDataThread import sendDataThread
-from debug import logger
 from helper_threading import StoppableThread
+
+
+logger = logging.getLogger(__name__)
 
 
 # For each stream to which we connect, several outgoingSynSender threads

@@ -1,3 +1,4 @@
+import logging
 import os
 import Queue
 import threading
@@ -9,13 +10,15 @@ import state
 from bmconfigparser import BMConfigParser
 from class_outgoingSynSender import outgoingSynSender
 from class_sendDataThread import sendDataThread
-from debug import logger
 from helper_sql import sqlQuery, sqlStoredProcedure
 from helper_threading import StoppableThread
 from inventory import Inventory
 from knownnodes import saveKnownNodes
 from queues import (UISignalQueue, addressGeneratorQueue, objectProcessorQueue,
                     workerQueue)
+
+
+logger = logging.getLogger(__name__)
 
 
 def doCleanShutdown():

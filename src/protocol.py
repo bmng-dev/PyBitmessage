@@ -1,5 +1,6 @@
 import base64
 import hashlib
+import logging
 import random
 import socket
 import ssl
@@ -15,11 +16,13 @@ import state
 from addresses import (calculateInventoryHash, decodeAddress, decodeVarint,
                        encodeVarint, varintDecodeError)
 from bmconfigparser import BMConfigParser
-from debug import logger
 from helper_sql import sqlExecute
 from inventory import Inventory
 from queues import objectProcessorQueue
 from version import softwareVersion
+
+
+logger = logging.getLogger(__name__)
 
 #Service flags
 NODE_NETWORK = 1

@@ -4,6 +4,7 @@
 import base64
 import hashlib
 import json
+import logging
 import socket
 import threading
 import time
@@ -22,12 +23,14 @@ import state
 from addresses import (addBMIfNotPresent, calculateInventoryHash,
                        decodeAddress, decodeVarint, varintDecodeError)
 from bmconfigparser import BMConfigParser
-from debug import logger
 from helper_sql import SqlBulkExecute, sqlExecute, sqlQuery, sqlStoredProcedure
 from helper_threading import StoppableThread
 from inventory import Inventory
 from pyelliptic.openssl import OpenSSL
 from version import softwareVersion
+
+
+logger = logging.getLogger(__name__)
 
 str_chan = '[chan]'
 

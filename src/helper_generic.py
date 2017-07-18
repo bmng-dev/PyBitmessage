@@ -1,3 +1,4 @@
+import logging
 import socket
 from multiprocessing import current_process
 from threading import current_thread, enumerate
@@ -5,7 +6,9 @@ from threading import current_thread, enumerate
 import queues
 import shutdown
 from bmconfigparser import BMConfigParser
-from debug import logger
+
+
+logger = logging.getLogger(__name__)
 
 
 def powQueueSize():

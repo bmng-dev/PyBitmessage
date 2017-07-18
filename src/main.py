@@ -19,6 +19,12 @@ sys.path.insert(0, app_dir)
 import depends
 depends.check_dependencies()
 
+import helper_startup
+helper_startup.loadConfig()
+
+import debug
+debug.configure_logging()
+
 import ctypes
 import signal  # Used to capture a Ctrl-C keypress so that Bitmessage can shutdown gracefully.
 import socket
@@ -39,8 +45,6 @@ from class_singleCleaner import singleCleaner
 from class_singleListener import singleListener
 from class_singleWorker import singleWorker
 from class_sqlThread import sqlThread
-from helper_startup import \
-    isOurOperatingSystemLimitedToHavingVeryFewHalfOpenConnections
 from singleinstance import singleinstance
 
 import helper_generic
@@ -50,7 +54,7 @@ def connectToStream(streamNumber):
     state.streamsInWhichIAmParticipating.append(streamNumber)
     selfInitiatedConnections[streamNumber] = {}
 
-    if isOurOperatingSystemLimitedToHavingVeryFewHalfOpenConnections():
+    if helper_startup.isOurOperatingSystemLimitedToHavingVeryFewHalfOpenConnections():
         # Some XP and Vista systems can only have 10 outgoing connections at a time.
         maximumNumberOfHalfOpenConnections = 9
     else:

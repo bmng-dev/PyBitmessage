@@ -1,8 +1,10 @@
 import hashlib
+import logging
 from binascii import hexlify, unhexlify
 from struct import pack, unpack
 
-#from debug import logger
+
+logger = logging.getLogger(__name__)
 
 ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
 

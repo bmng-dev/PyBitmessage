@@ -1,6 +1,7 @@
 from __future__ import division
 
 import hashlib
+import logging
 import random
 import threading
 import time
@@ -22,10 +23,12 @@ import tr
 from addresses import (calculateInventoryHash, decodeAddress, decodeVarint,
                        encodeVarint)
 from bmconfigparser import BMConfigParser
-from debug import logger
 from helper_sql import sqlExecute, sqlQuery
 from helper_threading import StoppableThread
 from inventory import Inventory, PendingUpload
+
+
+logger = logging.getLogger(__name__)
 
 
 # This thread, of which there is only one, does the heavy lifting:

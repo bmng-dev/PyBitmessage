@@ -1,4 +1,5 @@
 import errno
+import logging
 import Queue
 import re
 import socket
@@ -12,8 +13,10 @@ import state
 from bmconfigparser import BMConfigParser
 from class_receiveDataThread import receiveDataThread
 from class_sendDataThread import sendDataThread
-from debug import logger
 from helper_threading import StoppableThread
+
+
+logger = logging.getLogger(__name__)
 
 
 # Only one singleListener thread will ever exist. It creates the

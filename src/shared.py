@@ -8,6 +8,7 @@ useVeryEasyProofOfWorkForTesting = False  # If you set this to True while on the
 
 
 import hashlib
+import logging
 import os
 import stat
 import sys
@@ -27,6 +28,9 @@ from helper_sql import sqlExecute, sqlQuery
 from inventory import Inventory
 from pyelliptic import arithmetic
 from queues import objectProcessorQueue
+
+
+logger = logging.getLogger(__name__)
 
 myECCryptorObjects = {}
 MyECSubscriptionCryptorObjects = {}
@@ -533,5 +537,3 @@ def openKeysFile():
         subprocess.call(["xdg-open", state.appdata + 'keys.dat'])
     else:
         os.startfile(state.appdata + 'keys.dat')
-
-from debug import logger

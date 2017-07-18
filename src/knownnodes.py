@@ -1,3 +1,4 @@
+import logging
 import pickle
 import socket
 import threading
@@ -6,7 +7,9 @@ import time
 import socks
 import state
 from bmconfigparser import BMConfigParser
-from debug import logger
+
+
+logger = logging.getLogger(__name__)
 
 knownNodesLock = threading.Lock()
 knownNodes = {}

@@ -1,4 +1,5 @@
 import hashlib
+import logging
 import string
 import threading
 import time
@@ -20,9 +21,11 @@ import tr
 from addresses import (calculateInventoryHash, decodeAddress, decodeVarint,
                        encodeAddress, encodeVarint, varintDecodeError)
 from bmconfigparser import BMConfigParser
-from debug import logger
 from helper_sql import SqlBulkExecute, sqlExecute, sqlQuery
 from pyelliptic.openssl import OpenSSL
+
+
+logger = logging.getLogger(__name__)
 
 
 class objectProcessor(threading.Thread):

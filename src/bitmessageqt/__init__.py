@@ -1,5 +1,6 @@
 import hashlib
 import locale
+import logging
 import os
 import platform
 import sys
@@ -16,7 +17,8 @@ try:
 except (ImportError, ValueError):
     MessagingMenu = None
 
-from debug import logger
+logger = logging.getLogger(__name__)
+
 try:
     from PyQt4 import QtCore, QtGui
     from PyQt4.QtCore import QByteArray, QSettings, QString, Qt, QTimer

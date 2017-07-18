@@ -1,11 +1,14 @@
+import logging
 import os
 import time
 from struct import pack
 
 import paths
 from bmconfigparser import BMConfigParser
-from debug import logger
 from state import shutdown
+
+
+logger = logging.getLogger(__name__)
 
 libAvailable = True
 ctx = False

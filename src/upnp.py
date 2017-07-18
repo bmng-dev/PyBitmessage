@@ -1,6 +1,7 @@
 # A simple upnp module to forward port for BitMessage
 # Reference: http://mattscodecave.com/posts/using-python-and-upnp-to-forward-a-port
 import httplib
+import logging
 import socket
 import threading
 import time
@@ -13,6 +14,9 @@ import state
 import tr
 from bmconfigparser import BMConfigParser
 from helper_threading import StoppableThread
+
+
+logger = logging.getLogger(__name__)
 
 
 def createRequestXML(service, action, arguments=None):
@@ -79,7 +83,6 @@ class Router:
         import urllib2
         from xml.dom.minidom import parseString
         from urlparse import urlparse
-        from debug import logger
 
         self.address = address
 
@@ -114,7 +117,6 @@ class Router:
                 self.upnp_schema = service.childNodes[0].data.split(':')[-2]
 
     def AddPortMapping(self, externalPort, internalPort, internalClient, protocol, description, leaseDuration = 0, enabled = 1):
-        from debug import logger
         resp = self.soapRequest(self.upnp_schema + ':1', 'AddPortMapping', [
                 ('NewRemoteHost', ''),
                 ('NewExternalPort', str(externalPort)),
@@ -130,7 +132,6 @@ class Router:
         return resp
 
     def DeletePortMapping(self, externalPort, protocol):
-        from debug import logger
         resp = self.soapRequest(self.upnp_schema + ':1', 'DeletePortMapping', [
                 ('NewRemoteHost', ''),
                 ('NewExternalPort', str(externalPort)),
@@ -147,7 +148,6 @@ class Router:
     
     def soapRequest(self, service, action, arguments=None):
         from xml.dom.minidom import parseString
-        from debug import logger
         conn = httplib.HTTPConnection(self.routerPath.hostname, self.routerPath.port)
         conn.request(
             'POST',
@@ -196,8 +196,6 @@ class uPnPThread(threading.Thread, StoppableThread):
         self.initStop()
 
     def run(self):
-        from debug import logger
-        
         logger.debug("Starting UPnP thread")
         logger.debug("Local IP: %s", self.localIP)
         lastSent = 0
@@ -260,7 +258,6 @@ class uPnPThread(threading.Thread, StoppableThread):
         return s.getsockname()[0]
 
     def sendSearchRouter(self):
-        from debug import logger
         ssdpRequest = "M-SEARCH * HTTP/1.1\r\n" + \
                     "HOST: %s:%d\r\n" % (uPnPThread.SSDP_ADDR, uPnPThread.SSDP_PORT) + \
                     "MAN: \"ssdp:discover\"\r\n" + \
@@ -274,8 +271,6 @@ class uPnPThread(threading.Thread, StoppableThread):
             logger.exception("UPnP send query failed")
 
     def createPortMapping(self, router):
-        from debug import logger
-
         for i in range(50):
             try:
                 routerIP, = unpack('>I', socket.inet_aton(router.address))
@@ -298,6 +293,3 @@ class uPnPThread(threading.Thread, StoppableThread):
 
     def deletePortMapping(self, router):
         router.DeletePortMapping(router.extPort, 'TCP')
-
-
-

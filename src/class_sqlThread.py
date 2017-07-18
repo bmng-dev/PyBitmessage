@@ -1,3 +1,4 @@
+import logging
 import os
 import random
 import sqlite3
@@ -11,7 +12,9 @@ import queues
 import state
 import tr
 from bmconfigparser import BMConfigParser
-from debug import logger
+
+
+logger = logging.getLogger(__name__)
 
 
 # This thread exists because SQLITE3 is so un-threadsafe that we must

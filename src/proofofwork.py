@@ -1,5 +1,6 @@
 import ctypes
 import hashlib
+import logging
 import os
 import sys
 import time
@@ -12,7 +13,9 @@ import queues
 import state
 import tr
 from bmconfigparser import BMConfigParser
-from debug import logger
+
+
+logger = logging.getLogger(__name__)
 
 bitmsglib = 'bitmsghash.so'
 

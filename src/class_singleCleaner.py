@@ -1,3 +1,4 @@
+import logging
 import os
 import threading
 import time
@@ -9,10 +10,12 @@ import shared
 import state
 import tr
 from bmconfigparser import BMConfigParser
-from debug import logger
 from helper_sql import sqlExecute, sqlQuery
 from helper_threading import StoppableThread
 from inventory import Inventory
+
+
+logger = logging.getLogger(__name__)
 
 
 """

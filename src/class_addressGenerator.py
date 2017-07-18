@@ -1,4 +1,5 @@
 import hashlib
+import logging
 import sys
 import threading
 import time
@@ -12,10 +13,12 @@ import state
 import tr
 from addresses import decodeAddress, encodeAddress, encodeVarint
 from bmconfigparser import BMConfigParser
-from debug import logger
 from helper_threading import StoppableThread
 from pyelliptic import arithmetic
 from pyelliptic.openssl import OpenSSL
+
+
+logger = logging.getLogger(__name__)
 
 
 class addressGenerator(threading.Thread, StoppableThread):

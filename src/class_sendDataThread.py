@@ -1,4 +1,5 @@
 import errno
+import logging
 import select
 import socket
 import sys
@@ -12,8 +13,10 @@ import state
 import throttle
 from addresses import encodeVarint
 from class_objectHashHolder import objectHashHolder
-from debug import logger
 from inventory import PendingUpload
+
+
+logger = logging.getLogger(__name__)
 
 
 # Every connection to a peer has a sendDataThread (and also a

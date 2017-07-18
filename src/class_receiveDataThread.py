@@ -4,6 +4,7 @@ import base64
 import datetime
 import errno
 import hashlib
+import logging
 import math
 import os
 import Queue
@@ -30,10 +31,12 @@ from addresses import (calculateInventoryHash, decodeVarint, encodeVarint,
                        varintDecodeError)
 from bmconfigparser import BMConfigParser
 from class_objectHashHolder import objectHashHolder
-from debug import logger
 from helper_generic import isHostInPrivateIPRange
 from inventory import Inventory, PendingDownloadQueue, PendingUpload
 from version import softwareVersion
+
+
+logger = logging.getLogger(__name__)
 
 
 # This thread is created either by the synSenderThread(for outgoing
