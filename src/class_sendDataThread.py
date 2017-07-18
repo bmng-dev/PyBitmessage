@@ -135,8 +135,6 @@ class sendDataThread(threading.Thread):
                     specifiedRemoteProtocolVersion = data
                     logger.debug('setting the remote node\'s protocol version in the sendDataThread (ID: ' + str(id(self)) + ') to ' + str(specifiedRemoteProtocolVersion))
                     self.remoteProtocolVersion = specifiedRemoteProtocolVersion
-                elif command == 'advertisepeer':
-                    self.objectHashHolderInstance.holdPeer(data)
                 elif command == 'sendaddr':
                     if self.connectionIsOrWasFullyEstablished: # only send addr messages if we have sent and heard a verack from the remote node
                         numberOfAddressesInAddrMessage = len(data)

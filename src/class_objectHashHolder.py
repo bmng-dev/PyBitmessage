@@ -19,10 +19,8 @@ class objectHashHolder(threading.Thread):
         self.shutdown = False
         self.sendDataThreadMailbox = sendDataThreadMailbox # This queue is used to submit data back to our associated sendDataThread.
         self.collectionOfHashLists = []
-        self.collectionOfPeerLists = []
         for i in range(objectHashHolder.size):
             self.collectionOfHashLists.append([])
-            self.collectionOfPeerLists.append([])
 
     def run(self):
         iterator = 0
@@ -30,9 +28,6 @@ class objectHashHolder(threading.Thread):
             if len(self.collectionOfHashLists[iterator]) > 0:
                 self.sendDataThreadMailbox.put((0, 'sendinv', self.collectionOfHashLists[iterator]))
                 self.collectionOfHashLists[iterator] = []
-            if len(self.collectionOfPeerLists[iterator]) > 0:
-                self.sendDataThreadMailbox.put((0, 'sendaddr', self.collectionOfPeerLists[iterator]))
-                self.collectionOfPeerLists[iterator] = []
             iterator += 1
             iterator %= objectHashHolder.size
             time.sleep(1)
@@ -45,9 +40,6 @@ class objectHashHolder(threading.Thread):
             return True
         return False
 
-    def holdPeer(self,peerDetails):
-        self.collectionOfPeerLists[random.randrange(0, objectHashHolder.size)].append(peerDetails)
-        
     def hashCount(self):
         return sum([len(x) for x in self.collectionOfHashLists if type(x) is list])
 

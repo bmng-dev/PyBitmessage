@@ -17,7 +17,7 @@ import threading
 import time
 import traceback
 from binascii import hexlify
-from struct import pack, unpack
+from struct import unpack
 
 import knownnodes
 import paths
@@ -49,6 +49,7 @@ class receiveDataThread(threading.Thread):
         self.data = ''
         self.verackSent = False
         self.verackReceived = False
+        self.addrReceived = False
 
     def setup(
         self,
@@ -394,12 +395,6 @@ class receiveDataThread(threading.Thread):
         # we need to send our own objects to this node
         PendingUpload().add()
 
-        # Let all of our peers know about this new node.
-        for stream in self.remoteStreams:
-            dataToSend = (int(time.time()), stream, self.services, self.peer.host, self.remoteNodeIncomingPort)
-            protocol.broadcastToSendDataQueues((
-                stream, 'advertisepeer', dataToSend))
-
         self.sendaddr()  # This is one large addr message to this one peer.
         if len(shared.connectedHostsList) > \
             BMConfigParser().safeGetInt("bitmessagesettings", "maxtotalconnections", 200):
@@ -604,6 +599,12 @@ class receiveDataThread(threading.Thread):
 
     # We have received an addr message.
     def recaddr(self, data):
+        if self.addrReceived:
+            logger.debug('Ignoring extraneous addr (%d bytes)', len(data))
+            return
+
+        self.addrReceived = True
+
         numberOfAddressesIncluded, lengthOfNumberOfAddresses = decodeVarint(
             data[:10])
 
@@ -654,11 +655,6 @@ class receiveDataThread(threading.Thread):
                     elif len(knownnodes.knownNodes[recaddrStream]) < 20000:
                         with knownnodes.knownNodesLock:
                             knownnodes.knownNodes[recaddrStream][peerFromAddrMessage] = timeSomeoneElseReceivedMessageFromThisNode
-                        hostDetails = (
-                            timeSomeoneElseReceivedMessageFromThisNode,
-                            recaddrStream, recaddrServices, hostStandardFormat, recaddrPort)
-                        protocol.broadcastToSendDataQueues((
-                            recaddrStream, 'advertisepeer', hostDetails))
                         logger.debug('added new node ' + str(peerFromAddrMessage) + ' to knownNodes in stream ' + str(recaddrStream))
                         shared.needToWriteKnownNodesToDisk = True
             # only update if normal mode
@@ -679,96 +675,38 @@ class receiveDataThread(threading.Thread):
     # peer (with the full exchange of version and verack 
     # messages).
     def sendaddr(self):
-        def sendChunk():
-            if numberOfAddressesInAddrMessage == 0:
-                return
-            self.sendDataThreadQueue.put((0, 'sendRawData', \
-                protocol.CreatePacket('addr', \
-                encodeVarint(numberOfAddressesInAddrMessage) + payload)))
+        MAX_SUBSTREAM_ADDR = 500
 
-        # We are going to share a maximum number of 1000 addrs (per overlapping
-        # stream) with our peer. 500 from overlapping streams, 250 from the
-        # left child stream, and 250 from the right child stream.
-        maxAddrCount = BMConfigParser().safeGetInt("bitmessagesettings", "maxaddrperstreamsend", 500)
+        # protocol defines this as a maximum
+        MAX_ADDR = 1000
 
-        # protocol defines this as a maximum in one chunk
-        protocolAddrLimit = 1000
+        def itersubstreams():
+            for stream in self.streamNumber:
+                s = stream * 2
+                yield s
+                yield s + 1
+        streams = set(self.streamNumber)
+        substreams = set(itersubstreams()) - streams
 
-        # init
-        numberOfAddressesInAddrMessage = 0
-        payload = ''
-
-        for stream in self.streamNumber:
-            addrsInMyStream = {}
-            addrsInChildStreamLeft = {}
-            addrsInChildStreamRight = {}
-
+        threshold = int(time.time()) - shared.maximumAgeOfNodesThatIAdvertiseToOthers
+        def iternodes(streams):
             with knownnodes.knownNodesLock:
-                if len(knownnodes.knownNodes[stream]) > 0:
-                    filtered = {k: v for k, v in knownnodes.knownNodes[stream].items()
-                        if v > (int(time.time()) - shared.maximumAgeOfNodesThatIAdvertiseToOthers)}
-                    elemCount = len(filtered)
-                    if elemCount > maxAddrCount:
-                        elemCount = maxAddrCount
-                    # only if more recent than 3 hours
-                    addrsInMyStream = random.sample(filtered.items(), elemCount)
-                # sent 250 only if the remote isn't interested in it
-                if len(knownnodes.knownNodes[stream * 2]) > 0 and stream not in self.streamNumber:
-                    filtered = {k: v for k, v in knownnodes.knownNodes[stream*2].items()
-                        if v > (int(time.time()) - shared.maximumAgeOfNodesThatIAdvertiseToOthers)}
-                    elemCount = len(filtered)
-                    if elemCount > maxAddrCount / 2:
-                        elemCount = int(maxAddrCount / 2)
-                    addrsInChildStreamLeft = random.sample(filtered.items(), elemCount)
-                if len(knownnodes.knownNodes[(stream * 2) + 1]) > 0 and stream not in self.streamNumber:
-                    filtered = {k: v for k, v in knownnodes.knownNodes[stream*2+1].items()
-                        if v > (int(time.time()) - shared.maximumAgeOfNodesThatIAdvertiseToOthers)}
-                    elemCount = len(filtered)
-                    if elemCount > maxAddrCount / 2:
-                        elemCount = int(maxAddrCount / 2)
-                    addrsInChildStreamRight = random.sample(filtered.items(), elemCount)
-            for (HOST, PORT), timeLastReceivedMessageFromThisNode in addrsInMyStream:
-                numberOfAddressesInAddrMessage += 1
-                payload += pack(
-                    '>Q', timeLastReceivedMessageFromThisNode)  # 64-bit time
-                payload += pack('>I', stream)
-                payload += pack(
-                    '>q', 1)  # service bit flags offered by this node
-                payload += protocol.encodeHost(HOST)
-                payload += pack('>H', PORT)  # remote port
-                if numberOfAddressesInAddrMessage >= protocolAddrLimit:
-                    sendChunk()
-                    payload = ''
-                    numberOfAddressesInAddrMessage = 0
-            for (HOST, PORT), timeLastReceivedMessageFromThisNode in addrsInChildStreamLeft:
-                numberOfAddressesInAddrMessage += 1
-                payload += pack(
-                    '>Q', timeLastReceivedMessageFromThisNode)  # 64-bit time
-                payload += pack('>I', stream * 2)
-                payload += pack(
-                    '>q', 1)  # service bit flags offered by this node
-                payload += protocol.encodeHost(HOST)
-                payload += pack('>H', PORT)  # remote port
-                if numberOfAddressesInAddrMessage >= protocolAddrLimit:
-                    sendChunk()
-                    payload = ''
-                    numberOfAddressesInAddrMessage = 0
-            for (HOST, PORT), timeLastReceivedMessageFromThisNode in addrsInChildStreamRight:
-                numberOfAddressesInAddrMessage += 1
-                payload += pack(
-                    '>Q', timeLastReceivedMessageFromThisNode)  # 64-bit time
-                payload += pack('>I', (stream * 2) + 1)
-                payload += pack(
-                    '>q', 1)  # service bit flags offered by this node
-                payload += protocol.encodeHost(HOST)
-                payload += pack('>H', PORT)  # remote port
-                if numberOfAddressesInAddrMessage >= protocolAddrLimit:
-                    sendChunk()
-                    payload = ''
-                    numberOfAddressesInAddrMessage = 0
-    
-        # flush
-        sendChunk()
+                for stream, nodes in knownnodes.knownNodes.iteritems():
+                    if stream not in streams:
+                        continue
+                    for (host, port), timestamp in nodes.iteritems():
+                        if timestamp < threshold:
+                            continue
+                        yield (timestamp, stream, 1, host, port)
+        nodes = list(iternodes(substreams))
+        nodes = random.sample(nodes, min(len(nodes), MAX_SUBSTREAM_ADDR))
+
+        nodes2 = list(iternodes(streams))
+        nodes2_len = len(nodes2)
+        nodes += random.sample(nodes2, min(nodes2_len, MAX_ADDR - nodes2_len))
+        nodes = random.sample(nodes, len(nodes))
+
+        self.sendDataThreadQueue.put((0, 'sendaddr', nodes))
 
     # We have received a version message
     def recversion(self, data):
