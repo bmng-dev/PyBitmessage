@@ -36,8 +36,7 @@ STATUS_WARNING = 0
 STATUS_ERROR = 1
 STATUS_FATAL = 2
 
-eightBytesOfRandomDataUsedToDetectConnectionsToSelf = pack(
-    '>Q', random.randrange(1, 18446744073709551615))
+ServerNodeId = random.getrandbits(64)
 
 #Compiled struct for packing/unpacking headers
 #New code should use CreatePacket instead of Header.pack
@@ -163,7 +162,8 @@ def assembleVersionMessage(remoteHost, remotePort, participatingStreams, server 
         payload += pack('>H', BMConfigParser().getint('bitmessagesettings', 'port'))
 
     random.seed()
-    payload += eightBytesOfRandomDataUsedToDetectConnectionsToSelf
+    nodeId = ServerNodeId if server else random.getrandbits(64)
+    payload += pack('>Q', nodeId)
     userAgent = '/PyBitmessage:' + softwareVersion + '/'
     payload += encodeVarint(len(userAgent))
     payload += userAgent

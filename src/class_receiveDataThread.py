@@ -775,7 +775,8 @@ class receiveDataThread(threading.Thread):
         shared.connectedHostsList[
             self.hostIdent] = 1  # We use this data structure to not only keep track of what hosts we are connected to so that we don't try to connect to them again, but also to list the connections count on the Network Status tab.
         self.sendDataThreadQueue.put((0, 'setStreamNumber', self.remoteStreams))
-        if data[72:80] == protocol.eightBytesOfRandomDataUsedToDetectConnectionsToSelf:
+        self.remoteNodeId, = unpack('>Q', data[72:80])
+        if self.remoteNodeId == protocol.ServerNodeId:
             self.sendDataThreadQueue.put((0, 'shutdown','no data'))
             logger.debug('Closing connection to myself: ' + str(self.peer))
             return
