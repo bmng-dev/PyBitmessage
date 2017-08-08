@@ -19,7 +19,7 @@ import state
 log_level = 'WARNING'
 
 def log_uncaught_exceptions(ex_cls, ex, tb):
-    logging.getLogger(__name__).exception('Unhandled exception', exc_info=(ex_cls, ex, tb))
+    logging.getLogger(__name__).error('Unhandled exception', exc_info=(ex_cls, ex, tb))
 
 def configure_logging():
     have_logging = False
