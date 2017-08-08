@@ -1,0 +1,33 @@
+strictness: none
+test-warnings: false
+doc-warnings: false
+member-warnings: true
+uses: []
+autodetect: false
+
+dodgy:
+  run: false
+
+frosted:
+  run: false
+
+mccabe:
+  run: false
+
+pep8:
+  run: false
+
+pep257:
+  run: false
+
+pyflakes:
+  run: true
+
+pylint:
+  run: false
+
+pyroma:
+  run: false
+
+vulture:
+  run: false
