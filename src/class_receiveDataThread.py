@@ -33,7 +33,6 @@ from bmconfigparser import BMConfigParser
 from class_objectHashHolder import objectHashHolder
 from helper_generic import isHostInPrivateIPRange
 from inventory import Inventory, PendingDownloadQueue, PendingUpload
-from version import softwareVersion
 
 
 logger = logging.getLogger(__name__)
@@ -736,27 +735,7 @@ class receiveDataThread(threading.Thread):
             data[80:84])
         readPosition = 80 + lengthOfUseragentVarint
         self.userAgent = data[readPosition:readPosition + useragentLength]
-        
-        # version check
-        try:
-            userAgentName, userAgentVersion = self.userAgent[1:-1].split(":", 2)
-        except:
-            userAgentName = self.userAgent
-            userAgentVersion = "0.0.0"
-        if userAgentName == "PyBitmessage":
-            myVersion = [int(n) for n in softwareVersion.split(".")]
-            try:
-                remoteVersion = [int(n) for n in userAgentVersion.split(".")]
-            except:
-                remoteVersion = 0
-            # remote is newer, but do not cross between stable and unstable
-            try:
-                if cmp(remoteVersion, myVersion) > 0 and \
-                    (myVersion[1] % 2 == remoteVersion[1] % 2):
-                    queues.UISignalQueue.put(('newVersionAvailable', remoteVersion))
-            except:
-                pass
-                
+
         readPosition += useragentLength
         numberOfStreamsInVersionMessage, lengthOfNumberOfStreamsInVersionMessage = decodeVarint(
             data[readPosition:])

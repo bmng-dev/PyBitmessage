@@ -69,8 +69,6 @@ class UISignaler(QThread):
                 self.emit(SIGNAL("rerenderBlackWhiteList()"))
             elif command == 'removeInboxRowByMsgid':
                 self.emit(SIGNAL("removeInboxRowByMsgid(PyQt_PyObject)"), data)
-            elif command == 'newVersionAvailable':
-                self.emit(SIGNAL("newVersionAvailable(PyQt_PyObject)"), data)
             elif command == 'alert':
                 title, text, exitAfterUserClicksOk = data
                 self.emit(SIGNAL("displayAlert(PyQt_PyObject, PyQt_PyObject, PyQt_PyObject)"), title, text, exitAfterUserClicksOk)
