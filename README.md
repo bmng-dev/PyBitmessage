@@ -1,6 +1,8 @@
 PyBitmessage
 ============
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/ce4db342113f4d93a91106d0a6d4a8c0)](https://www.codacy.com/app/bmng-dev/PyBitmessage?utm_source=github.com&utm_medium=referral&utm_content=bmng-dev/PyBitmessage&utm_campaign=badger)
+
 Bitmessage is a P2P communications protocol used to send encrypted messages to
 another person or to many subscribers. It is decentralized and trustless,
 meaning that you need-not inherently trust any entities like root certificate
