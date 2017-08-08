@@ -1,11 +1,9 @@
 import errno
 import logging
-import select
 import socket
-import sys
 import threading
 import time
-from ssl import SSL_ERROR_WANT_WRITE, SSLError
+from ssl import SSLError
 from struct import pack
 
 import protocol
@@ -79,29 +77,15 @@ class sendDataThread(threading.Thread):
             return True
 
         while self.buffer and state.shutdown == 0:
-            isSSL = False
             try:
-                if ((self.services & protocol.NODE_SSL == protocol.NODE_SSL) and
-                    self.connectionIsOrWasFullyEstablished and
-                    protocol.haveSSL(not self.initiatedConnection)):
-                    isSSL = True
-                    amountSent = self.sslSock.send(self.buffer[:throttle.SendThrottle().chunkSize])
-                else:
-                    amountSent = self.sock.send(self.buffer[:throttle.SendThrottle().chunkSize])
+                amountSent = self.sock.send(self.buffer[:throttle.SendThrottle().chunkSize])
             except socket.timeout:
                 continue
             except SSLError as e:
-                if e.errno == SSL_ERROR_WANT_WRITE:
-                    select.select([], [self.sslSock], [], 10)
-                    logger.debug('sock.recv retriable SSL error')
-                    continue
-                logger.debug('Connection error (SSL)')
+                logger.error('Connection error (SSL)', exc_info=(type(e), e, None))
                 return False
             except socket.error as e:
-                if e.errno in (errno.EAGAIN, errno.EWOULDBLOCK) or \
-                    (sys.platform.startswith('win') and \
-                    e.errno == errno.WSAEWOULDBLOCK):
-                    select.select([], [self.sslSock if isSSL else self.sock], [], 10)
+                if e.errno in (errno.EAGAIN, errno.EINTR):
                     logger.debug('sock.recv retriable error')
                     continue
                 if e.errno in (errno.EPIPE, errno.ECONNRESET, errno.EHOSTUNREACH, errno.ETIMEDOUT, errno.ECONNREFUSED):
@@ -193,7 +177,7 @@ class sendDataThread(threading.Thread):
                         break
                 elif command == 'connectionIsOrWasFullyEstablished':
                     self.connectionIsOrWasFullyEstablished = True
-                    self.services, self.sslSock = data
+                    self.services, self.sock = data
             elif self.connectionIsOrWasFullyEstablished:
                 logger.error('sendDataThread ID: ' + str(id(self)) + ' ignoring command ' + command + ' because the thread is not in stream ' + str(deststream) + ' but in streams ' + ', '.join(str(x) for x in self.streamNumber))
             self.sendDataThreadQueue.task_done()

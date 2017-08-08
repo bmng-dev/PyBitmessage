@@ -9,7 +9,6 @@ import math
 import os
 import Queue
 import random
-import select
 import socket
 import ssl
 import sys
@@ -88,14 +87,7 @@ class receiveDataThread(threading.Thread):
         while state.shutdown == 0:
             dataLen = len(self.data)
             try:
-                isSSL = False
-                if ((self.services & protocol.NODE_SSL == protocol.NODE_SSL) and
-                    self.connectionIsOrWasFullyEstablished and
-                    protocol.haveSSL(not self.initiatedConnection)):
-                    isSSL = True
-                    dataRecv = self.sslSock.recv(throttle.ReceiveThrottle().chunkSize)
-                else:
-                    dataRecv = self.sock.recv(throttle.ReceiveThrottle().chunkSize)
+                dataRecv = self.sock.recv(throttle.ReceiveThrottle().chunkSize)
                 self.data += dataRecv
                 throttle.ReceiveThrottle().wait(len(dataRecv))
             except socket.timeout:
@@ -105,10 +97,6 @@ class receiveDataThread(threading.Thread):
                 logger.error("Timeout during protocol initialisation")
                 break
             except ssl.SSLError as err:
-                if err.errno == ssl.SSL_ERROR_WANT_READ:
-                    select.select([self.sslSock], [], [], 10)
-                    logger.debug('sock.recv retriable SSL error')
-                    continue
                 if err.errno is None and 'timed out' in str(err):
                     if self.connectionIsOrWasFullyEstablished:
                         self.sendping("Still around!")
@@ -116,10 +104,7 @@ class receiveDataThread(threading.Thread):
                 logger.error ('SSL error: %i/%s', err.errno if err.errno else 0, str(err))
                 break
             except socket.error as err:
-                if err.errno in (errno.EAGAIN, errno.EWOULDBLOCK) or \
-                    (sys.platform.startswith('win') and \
-                    err.errno == errno.WSAEWOULDBLOCK):
-                    select.select([self.sslSock if isSSL else self.sock], [], [], 10)
+                if err.errno in (errno.EAGAIN, errno.EINTR):
                     logger.debug('sock.recv retriable error')
                     continue
                 logger.error('sock.recv error. Closing receiveData thread, %s', str(err))
@@ -270,64 +255,25 @@ class receiveDataThread(threading.Thread):
             self.connectionFullyEstablished()
 
     def sslHandshake(self):
-        self.sslSock = self.sock
-        if ((self.services & protocol.NODE_SSL == protocol.NODE_SSL) and
-            protocol.haveSSL(not self.initiatedConnection)):
-            logger.debug("Initialising TLS")
-            if sys.version_info >= (2,7,9):
-                context = ssl.SSLContext(protocol.sslProtocolVersion)
-                context.set_ciphers(protocol.sslProtocolCiphers)
-                context.set_ecdh_curve("secp256k1")
-                context.check_hostname = False
-                context.verify_mode = ssl.CERT_NONE
-                # also exclude TLSv1 and TLSv1.1 in the future
-                context.options = ssl.OP_ALL | ssl.OP_NO_SSLv2 | ssl.OP_NO_SSLv3 | ssl.OP_SINGLE_ECDH_USE | ssl.OP_CIPHER_SERVER_PREFERENCE
-                self.sslSock = context.wrap_socket(self.sock, server_side = not self.initiatedConnection, do_handshake_on_connect=False)
-            else:
-                self.sslSock = ssl.wrap_socket(self.sock, keyfile = os.path.join(paths.codePath(), 'sslkeys', 'key.pem'), certfile = os.path.join(paths.codePath(), 'sslkeys', 'cert.pem'), server_side = not self.initiatedConnection, ssl_version=protocol.sslProtocolVersion, do_handshake_on_connect=False, ciphers=protocol.sslProtocolCiphers)
-            self.sendDataThreadQueue.join()
-            while True:
-                try:
-                    self.sslSock.do_handshake()
-                    logger.debug("TLS handshake success")
-                    if sys.version_info >= (2, 7, 9):
-                        logger.debug("TLS protocol version: %s", self.sslSock.version())
-                    break
-                except ssl.SSLError as e:
-                    if sys.hexversion >= 0x02070900:
-                        if isinstance (e, ssl.SSLWantReadError):
-                            logger.debug("Waiting for SSL socket handhake read")
-                            select.select([self.sslSock], [], [], 10)
-                            continue
-                        elif isinstance (e, ssl.SSLWantWriteError):
-                            logger.debug("Waiting for SSL socket handhake write")
-                            select.select([], [self.sslSock], [], 10)
-                            continue
-                    else:
-                        if e.args[0] == ssl.SSL_ERROR_WANT_READ:
-                            logger.debug("Waiting for SSL socket handhake read")
-                            select.select([self.sslSock], [], [], 10)
-                            continue
-                        elif e.args[0] == ssl.SSL_ERROR_WANT_WRITE:
-                            logger.debug("Waiting for SSL socket handhake write")
-                            select.select([], [self.sslSock], [], 10)
-                            continue
-                    logger.error("SSL socket handhake failed: shutting down connection, %s", str(e))
-                    self.sendDataThreadQueue.put((0, 'shutdown','tls handshake fail %s' % (str(e))))
-                    return False
-                except socket.error as err:
-                    logger.debug('SSL socket handshake failed, shutting down connection, %s', str(err))
-                    self.sendDataThreadQueue.put((0, 'shutdown','tls handshake fail'))
-                    return False
-                except Exception:
-                    logger.error("SSL socket handhake failed, shutting down connection", exc_info=True)
-                    self.sendDataThreadQueue.put((0, 'shutdown','tls handshake fail'))
-                    return False
-            # SSL in the background should be blocking, otherwise the error handling is difficult
-            self.sslSock.settimeout(None)
-            return True
-        # no SSL
-        return True
+        logger.debug("Initialising TLS")
+        if sys.version_info >= (2,7,9):
+            context = ssl.SSLContext(protocol.sslProtocolVersion)
+            context.set_ciphers(protocol.sslProtocolCiphers)
+            context.set_ecdh_curve("secp256k1")
+            context.check_hostname = False
+            context.verify_mode = ssl.CERT_NONE
+            # also exclude TLSv1 and TLSv1.1 in the future
+            context.options = ssl.OP_ALL | ssl.OP_NO_SSLv2 | ssl.OP_NO_SSLv3 | ssl.OP_SINGLE_ECDH_USE | ssl.OP_CIPHER_SERVER_PREFERENCE
+            self.sock = context.wrap_socket(self.sock, server_side = not self.initiatedConnection, do_handshake_on_connect=False)
+        else:
+            self.sock = ssl.wrap_socket(self.sock, keyfile = os.path.join(paths.codePath(), 'sslkeys', 'key.pem'), certfile = os.path.join(paths.codePath(), 'sslkeys', 'cert.pem'), server_side = not self.initiatedConnection, ssl_version=protocol.sslProtocolVersion, do_handshake_on_connect=False, ciphers=protocol.sslProtocolCiphers)
+        self.sendDataThreadQueue.join()
+
+        self.sock.do_handshake()
+        cipher, definition, strength = self.sock.cipher()
+        logger.debug("TLS handshake success - %s defined in %s using %d secret bits", cipher, definition, strength)
+        if sys.version_info >= (2, 7, 9):
+            logger.debug("TLS protocol version: %s", self.sock.version())
 
     def peerValidityChecks(self):
         if self.remoteProtocolVersion < 3:
@@ -362,8 +308,14 @@ class receiveDataThread(threading.Thread):
             # there is no reason to run this function a second time
             return
 
-        if not self.sslHandshake():
-            return
+        if ((self.services & protocol.NODE_SSL == protocol.NODE_SSL) and
+            protocol.haveSSL(not self.initiatedConnection)):
+            try:
+                self.sslHandshake()
+            except socket.error as ex:
+                logger.error("SSL socket handshake failed, shutting down connection", exc_info=(type(ex), ex, None))
+                self.sendDataThreadQueue.put((0, 'shutdown', None))
+                return
 
         if self.peerValidityChecks() == False:
             time.sleep(2)
@@ -375,7 +327,7 @@ class receiveDataThread(threading.Thread):
         shared.timeOffsetWrongCount = 0
 
         # Command the corresponding sendDataThread to set its own connectionIsOrWasFullyEstablished variable to True also
-        self.sendDataThreadQueue.put((0, 'connectionIsOrWasFullyEstablished', (self.services, self.sslSock)))
+        self.sendDataThreadQueue.put((0, 'connectionIsOrWasFullyEstablished', (self.services, self.sock)))
 
         if not self.initiatedConnection:
             shared.clientHasReceivedIncomingConnections = True
