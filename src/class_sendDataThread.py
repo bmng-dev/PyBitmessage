@@ -80,7 +80,8 @@ class sendDataThread(threading.Thread):
             try:
                 amountSent = self.sock.send(self.buffer[:throttle.SendThrottle().chunkSize])
             except socket.timeout:
-                continue
+                logger.error('TCP send timed out after %s secs', self.sock.gettimeout())
+                return False
             except SSLError as e:
                 logger.error('Connection error (SSL)', exc_info=(type(e), e, None))
                 return False

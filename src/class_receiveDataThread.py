@@ -91,17 +91,13 @@ class receiveDataThread(threading.Thread):
                 self.data += dataRecv
                 throttle.ReceiveThrottle().wait(len(dataRecv))
             except socket.timeout:
-                if self.connectionIsOrWasFullyEstablished:
-                    self.sendping("Still around!")
-                    continue
-                logger.error("Timeout during protocol initialisation")
+                logger.error('TCP receive timed out after %s secs', self.sock.gettimeout())
                 break
             except ssl.SSLError as err:
-                if err.errno is None and 'timed out' in str(err):
-                    if self.connectionIsOrWasFullyEstablished:
-                        self.sendping("Still around!")
-                        continue
-                logger.error ('SSL error: %i/%s', err.errno if err.errno else 0, str(err))
+                if err.message and err.message.endswith('timed out'):
+                    logger.error('TLS receive timed out after %s secs', self.sock.gettimeout())
+                else:
+                    logger.error ('SSL error: %i/%s', err.errno if err.errno else 0, str(err))
                 break
             except socket.error as err:
                 if err.errno in (errno.EAGAIN, errno.EINTR):
@@ -242,10 +238,6 @@ class receiveDataThread(threading.Thread):
     def sendpong(self, payload):
         logger.debug('Sending pong')
         self.sendDataThreadQueue.put((0, 'sendRawData', protocol.CreatePacket('pong', payload)))
-
-    def sendping(self, payload):
-        logger.debug('Sending ping')
-        self.sendDataThreadQueue.put((0, 'sendRawData', protocol.CreatePacket('ping', payload)))
 
     def recverack(self):
         logger.debug('verack received')
