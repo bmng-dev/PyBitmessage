@@ -92,7 +92,8 @@ class sendDataThread(threading.Thread):
                 if e.errno in (errno.EPIPE, errno.ECONNRESET, errno.EHOSTUNREACH, errno.ETIMEDOUT, errno.ECONNREFUSED):
                     logger.debug('Connection error: %s', str(e))
                     return False
-                raise
+                logger.exception('Send error')
+                return False
             throttle.SendThrottle().wait(amountSent)
             self.lastTimeISentData = int(time.time())
             self.buffer = self.buffer[amountSent:]
@@ -136,10 +137,7 @@ class sendDataThread(threading.Thread):
     
                         payload = encodeVarint(numberOfAddressesInAddrMessage) + payload
                         packet = protocol.CreatePacket('addr', payload)
-                        try:
-                            self.sendBytes(packet)
-                        except:
-                            logger.error('sendaddr: self.sock.sendall failed')
+                        if not self.sendBytes(packet):
                             break
                 elif command == 'advertiseobject':
                     self.objectHashHolderInstance.holdHash(data)
@@ -151,31 +149,23 @@ class sendDataThread(threading.Thread):
                         if payload != '':
                             payload = encodeVarint(len(payload)/32) + payload
                             packet = protocol.CreatePacket('inv', payload)
-                            try:
-                                self.sendBytes(packet)
-                            except:
-                                logger.error('sendinv: self.sock.sendall failed')
+                            if not self.sendBytes(packet):
                                 break
                 elif command == 'pong':
                     if self.lastTimeISentData < (int(time.time()) - 298):
                         # Send out a pong message to keep the connection alive.
                         logger.debug('Sending pong to ' + str(self.peer) + ' to keep connection alive.')
                         packet = protocol.CreatePacket('pong')
-                        try:
-                            self.sendBytes(packet)
-                        except:
-                            logger.error('send pong failed')
+                        if not self.sendBytes(packet):
                             break
                 elif command == 'sendRawData':
                     objectHash = None
                     if type(data) in [list, tuple]:
                         objectHash, data = data
-                    try:
-                        self.sendBytes(data)
-                        PendingUpload().delete(objectHash)
-                    except:
-                        logger.error('Sending of data to ' + str(self.peer) + ' failed. sendDataThread thread ' + str(self) + ' ending now.', exc_info=True)
+                    if not self.sendBytes(data):
                         break
+                    if objectHash:
+                        PendingUpload().delete(objectHash)
                 elif command == 'connectionIsOrWasFullyEstablished':
                     self.connectionIsOrWasFullyEstablished = True
                     self.services, self.sock = data
