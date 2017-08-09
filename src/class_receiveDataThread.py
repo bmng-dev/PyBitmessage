@@ -109,8 +109,8 @@ class receiveDataThread(threading.Thread):
             if len(self.data) == dataLen: # If self.sock.recv returned no data:
                 logger.debug('Connection to ' + str(self.peer) + ' closed. Closing receiveData thread')
                 break
-            else:
-                self.processData()
+            while self.processData():
+                pass
 
         try:
             for stream in self.streamNumber:
@@ -152,27 +152,23 @@ class receiveDataThread(threading.Thread):
 
     def processData(self):
         if len(self.data) < protocol.Header.size:  # if so little of the data has arrived that we can't even read the checksum then wait for more data.
-            return
+            return False
         
         magic,command,payloadLength,checksum = protocol.Header.unpack(self.data[:protocol.Header.size])
         if magic != 0xE9BEB4D9:
             self.data = ""
-            return
+            return False
         if payloadLength > 1600100: # ~1.6 MB which is the maximum possible size of an inv message.
             logger.info('The incoming message, which we have not yet download, is too large. Ignoring it. (unfortunately there is no way to tell the other node to stop sending it except to disconnect.) Message size: %s' % payloadLength)
             self.data = self.data[payloadLength + protocol.Header.size:]
-            del magic,command,payloadLength,checksum # we don't need these anymore and better to clean them now before the recursive call rather than after
-            self.processData()
-            return
+            return True
         if len(self.data) < payloadLength + protocol.Header.size:  # check if the whole message has arrived yet.
-            return
+            return False
         payload = self.data[protocol.Header.size:payloadLength + protocol.Header.size]
         if checksum != hashlib.sha512(payload).digest()[0:4]:  # test the checksum in the message.
             logger.error('Checksum incorrect. Clearing this message.')
             self.data = self.data[payloadLength + protocol.Header.size:]
-            del magic,command,payloadLength,checksum,payload # better to clean up before the recursive call
-            self.processData()
-            return
+            return True
 
         # The time we've last seen this node is obviously right now since we
         # just received valid data from it. So update the knownNodes list so
@@ -215,7 +211,6 @@ class receiveDataThread(threading.Thread):
         except Exception as e:
             logger.critical("Critical error in a receiveDataThread: \n%s" % traceback.format_exc())
         
-        del payload
         self.data = self.data[payloadLength + protocol.Header.size:] # take this message out and then process the next message
 
         if self.data == '': # if there are no more messages
@@ -233,7 +228,8 @@ class receiveDataThread(threading.Thread):
                 pass
             if len(toRequest) > 0:
                 self.sendgetdata(toRequest)
-        self.processData()
+            return False
+        return True
 
     def sendpong(self, payload):
         logger.debug('Sending pong')
