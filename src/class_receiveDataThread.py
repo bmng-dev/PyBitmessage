@@ -37,6 +37,8 @@ from inventory import Inventory, PendingDownloadQueue, PendingUpload
 logger = logging.getLogger(__name__)
 
 
+class ProtocolError(Exception): pass
+
 # This thread is created either by the synSenderThread(for outgoing
 # connections) or the singleListenerThread(for incoming connections).
 
@@ -109,8 +111,12 @@ class receiveDataThread(threading.Thread):
             if len(self.data) == dataLen: # If self.sock.recv returned no data:
                 logger.debug('Connection to ' + str(self.peer) + ' closed. Closing receiveData thread')
                 break
-            while self.processData():
-                pass
+            try:
+                while self.processData():
+                    pass
+            except ProtocolError as ex:
+                logger.error('Protocol violation: %s', ex.message)
+                break
 
         try:
             for stream in self.streamNumber:
@@ -156,12 +162,9 @@ class receiveDataThread(threading.Thread):
         
         magic,command,payloadLength,checksum = protocol.Header.unpack(self.data[:protocol.Header.size])
         if magic != 0xE9BEB4D9:
-            self.data = ""
-            return False
+            raise ProtocolError('Incorrect magic')
         if payloadLength > 1600100: # ~1.6 MB which is the maximum possible size of an inv message.
-            logger.info('The incoming message, which we have not yet download, is too large. Ignoring it. (unfortunately there is no way to tell the other node to stop sending it except to disconnect.) Message size: %s' % payloadLength)
-            self.data = self.data[payloadLength + protocol.Header.size:]
-            return True
+            raise ProtocolError('Oversized payload')
         if len(self.data) < payloadLength + protocol.Header.size:  # check if the whole message has arrived yet.
             return False
         payload = self.data[protocol.Header.size:payloadLength + protocol.Header.size]
