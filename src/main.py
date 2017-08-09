@@ -74,7 +74,7 @@ def connectToStream(streamNumber):
         if streamNumber*2+1 not in knownnodes.knownNodes:
             knownnodes.knownNodes[streamNumber*2+1] = {}
 
-    for i in range(maximumNumberOfHalfOpenConnections):
+    for i in xrange(maximumNumberOfHalfOpenConnections):
         a = outgoingSynSender()
         a.setup(streamNumber, selfInitiatedConnections)
         a.start()

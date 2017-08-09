@@ -219,7 +219,7 @@ class receiveDataThread(threading.Thread):
         if self.data == '': # if there are no more messages
             toRequest = []
             try:
-                for i in range(len(self.downloadQueue.pending), 100):
+                for i in xrange(len(self.downloadQueue.pending), 100):
                     while True:
                         hashId = self.downloadQueue.get(False)
                         if not hashId in Inventory():
@@ -450,7 +450,7 @@ class receiveDataThread(threading.Thread):
 
         startTime = time.time()
         advertisedSet = set()
-        for i in range(numberOfItemsInInv):
+        for i in xrange(numberOfItemsInInv):
             advertisedSet.add(data[lengthOfVarint + (32 * i):32 + lengthOfVarint + (32 * i)])
         objectsNewToMe = advertisedSet
         for stream in self.streamNumber:
@@ -559,7 +559,7 @@ class receiveDataThread(threading.Thread):
             logger.debug('addr message does not contain the correct amount of data. Ignoring.')
             return
 
-        for i in range(0, numberOfAddressesIncluded):
+        for i in xrange(0, numberOfAddressesIncluded):
             fullHost = data[20 + lengthOfNumberOfAddresses + (38 * i):36 + lengthOfNumberOfAddresses + (38 * i)]
             recaddrStream, = unpack('>I', data[8 + lengthOfNumberOfAddresses + (
                 38 * i):12 + lengthOfNumberOfAddresses + (38 * i)])
@@ -684,7 +684,7 @@ class receiveDataThread(threading.Thread):
             data[readPosition:])
         readPosition += lengthOfNumberOfStreamsInVersionMessage
         self.remoteStreams = []
-        for i in range(numberOfStreamsInVersionMessage):
+        for i in xrange(numberOfStreamsInVersionMessage):
             newStreamNumber, lengthOfRemoteStreamNumber = decodeVarint(data[readPosition:])
             readPosition += lengthOfRemoteStreamNumber
             self.remoteStreams.append(newStreamNumber)

@@ -19,7 +19,7 @@ class objectHashHolder(threading.Thread):
         self.shutdown = False
         self.sendDataThreadMailbox = sendDataThreadMailbox # This queue is used to submit data back to our associated sendDataThread.
         self.collectionOfHashLists = []
-        for i in range(objectHashHolder.size):
+        for i in xrange(objectHashHolder.size):
             self.collectionOfHashLists.append([])
 
     def run(self):

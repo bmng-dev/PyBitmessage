@@ -262,7 +262,7 @@ class sqlThread(threading.Thread):
         if not BMConfigParser().has_option('bitmessagesettings', 'useidenticons'):
             BMConfigParser().set('bitmessagesettings', 'useidenticons', 'True')
         if not BMConfigParser().has_option('bitmessagesettings', 'identiconsuffix'): # acts as a salt
-            BMConfigParser().set('bitmessagesettings', 'identiconsuffix', ''.join(random.choice("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz") for x in range(12))) # a twelve character pseudo-password to salt the identicons
+            BMConfigParser().set('bitmessagesettings', 'identiconsuffix', ''.join(random.choice("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz") for x in xrange(12))) # a twelve character pseudo-password to salt the identicons
 
         #Add settings to support no longer resending messages after a certain period of time even if we never get an ack
         if BMConfigParser().getint('bitmessagesettings', 'settingsversion') == 7:

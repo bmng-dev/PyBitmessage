@@ -61,7 +61,7 @@ class AccountMixin (object):
         if hasattr(self, "setExpanded"):
             self.setExpanded(enabled)
         if isinstance(self, Ui_AddressWidget):
-            for i in range(self.childCount()):
+            for i in xrange(self.childCount()):
                 if isinstance(self.child(i), Ui_FolderWidget):
                     self.child(i).setEnabled(enabled)
         if isinstance(self, QtGui.QTreeWidgetItem):

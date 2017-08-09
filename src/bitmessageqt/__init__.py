@@ -912,7 +912,7 @@ class MyForm(settingsmixin.SMainWindow):
         
         for treeWidget in widgets:
             root = treeWidget.invisibleRootItem()
-            for i in range(root.childCount()):
+            for i in xrange(root.childCount()):
                 addressItem = root.child(i)
                 newCount = 0
                 if addressItem.type == AccountMixin.ALL:
@@ -927,7 +927,7 @@ class MyForm(settingsmixin.SMainWindow):
                     addressItem.setUnreadCount(newCount)
                 if addressItem.childCount == 0:
                     continue
-                for j in range(addressItem.childCount()):
+                for j in xrange(addressItem.childCount()):
                     folderItem = addressItem.child(j)
                     newCount = 0
                     folderName = folderItem.folderName
@@ -948,7 +948,7 @@ class MyForm(settingsmixin.SMainWindow):
         if sortingEnabled:
             tableWidget.setSortingEnabled(False)
         tableWidget.insertRow(0)
-        for i in range(len(items)):
+        for i in xrange(len(items)):
             tableWidget.setItem(0, i, items[i])
         if sortingEnabled:
             tableWidget.setSortingEnabled(True)
@@ -1619,7 +1619,7 @@ class MyForm(settingsmixin.SMainWindow):
             if treeWidget in [self.ui.treeWidgetSubscriptions, self.ui.treeWidgetChans] and self.getCurrentAccount(treeWidget) != toAddress:
                 continue
 
-            for i in range(sent.rowCount()):
+            for i in xrange(sent.rowCount()):
                 rowAddress = sent.item(
                     i, 0).data(Qt.UserRole)
                 if toAddress == rowAddress:
@@ -1639,7 +1639,7 @@ class MyForm(settingsmixin.SMainWindow):
             treeWidget = self.widgetConvert(sent)
             if self.getCurrentFolder(treeWidget) != "sent":
                 continue
-            for i in range(sent.rowCount()):
+            for i in xrange(sent.rowCount()):
                 toAddress = sent.item(
                     i, 0).data(Qt.UserRole)
                 tableAckdata = sent.item(
@@ -1663,7 +1663,7 @@ class MyForm(settingsmixin.SMainWindow):
             self.ui.tableWidgetInbox,
             self.ui.tableWidgetInboxSubscriptions,
             self.ui.tableWidgetInboxChans]):
-            for i in range(inbox.rowCount()):
+            for i in xrange(inbox.rowCount()):
                 if msgid == str(inbox.item(i, 3).data(Qt.UserRole).toPyObject()):
                     self.statusBar().showMessage(_translate(
                         "MainWindow", "Message trashed"), 10000)
@@ -1680,12 +1680,12 @@ class MyForm(settingsmixin.SMainWindow):
 
     def rerenderMessagelistFromLabels(self):
         for messagelist in (self.ui.tableWidgetInbox, self.ui.tableWidgetInboxChans, self.ui.tableWidgetInboxSubscriptions):
-            for i in range(messagelist.rowCount()):
+            for i in xrange(messagelist.rowCount()):
                 messagelist.item(i, 1).setLabel()
 
     def rerenderMessagelistToLabels(self):
         for messagelist in (self.ui.tableWidgetInbox, self.ui.tableWidgetInboxChans, self.ui.tableWidgetInboxSubscriptions):
-            for i in range(messagelist.rowCount()):
+            for i in xrange(messagelist.rowCount()):
                 messagelist.item(i, 0).setLabel()
 
     def rerenderAddressBook(self):
@@ -1697,7 +1697,7 @@ class MyForm(settingsmixin.SMainWindow):
             self.ui.tableWidgetAddressBook.setItem(0, 1, newItem)
 
         oldRows = {}
-        for i in range(self.ui.tableWidgetAddressBook.rowCount()):
+        for i in xrange(self.ui.tableWidgetAddressBook.rowCount()):
             item = self.ui.tableWidgetAddressBook.item(i, 0)
             oldRows[item.address] = [item.label, item.type, i]
 
@@ -1943,7 +1943,7 @@ class MyForm(settingsmixin.SMainWindow):
 
     def click_pushButtonLoadFromAddressBook(self):
         self.ui.tabWidget.setCurrentIndex(5)
-        for i in range(4):
+        for i in xrange(4):
             time.sleep(0.1)
             self.statusBar().clearMessage()
             time.sleep(0.1)
@@ -1970,7 +1970,7 @@ class MyForm(settingsmixin.SMainWindow):
                     label = addressInKeysFile
                 self.ui.comboBoxSendFrom.addItem(avatarize(addressInKeysFile), label, addressInKeysFile)
 #        self.ui.comboBoxSendFrom.model().sort(1, Qt.AscendingOrder)
-        for i in range(self.ui.comboBoxSendFrom.count()):
+        for i in xrange(self.ui.comboBoxSendFrom.count()):
             address = str(self.ui.comboBoxSendFrom.itemData(i, Qt.UserRole).toString())
             self.ui.comboBoxSendFrom.setItemData(i, AccountColor(address).accountColor(), Qt.ForegroundRole)
         self.ui.comboBoxSendFrom.insertItem(0, '', '')
@@ -1990,7 +1990,7 @@ class MyForm(settingsmixin.SMainWindow):
                 if label == "":
                     label = addressInKeysFile
                 self.ui.comboBoxSendFromBroadcast.addItem(avatarize(addressInKeysFile), label, addressInKeysFile)
-        for i in range(self.ui.comboBoxSendFromBroadcast.count()):
+        for i in xrange(self.ui.comboBoxSendFromBroadcast.count()):
             address = str(self.ui.comboBoxSendFromBroadcast.itemData(i, Qt.UserRole).toString())
             self.ui.comboBoxSendFromBroadcast.setItemData(i, AccountColor(address).accountColor(), Qt.ForegroundRole)
         self.ui.comboBoxSendFromBroadcast.insertItem(0, '', '')
@@ -2357,7 +2357,7 @@ class MyForm(settingsmixin.SMainWindow):
 
         markread = 0
 
-        for i in range(0, tableWidget.rowCount()):
+        for i in xrange(0, tableWidget.rowCount()):
             msgids.append(str(tableWidget.item(
                 i, 3).data(Qt.UserRole).toPyObject()))
             tableWidget.item(i, 0).setUnread(False)
@@ -2654,7 +2654,7 @@ class MyForm(settingsmixin.SMainWindow):
                 address = messagelist.item(
                     currentInboxRow, 0).address
         for box in [self.ui.comboBoxSendFrom, self.ui.comboBoxSendFromBroadcast]:
-            listOfAddressesInComboBoxSendFrom = [str(box.itemData(i).toPyObject()) for i in range(box.count())]
+            listOfAddressesInComboBoxSendFrom = [str(box.itemData(i).toPyObject()) for i in xrange(box.count())]
             if address in listOfAddressesInComboBoxSendFrom:
                 currentIndex = listOfAddressesInComboBoxSendFrom.index(address)
                 box.setCurrentIndex(currentIndex)
@@ -2794,11 +2794,11 @@ class MyForm(settingsmixin.SMainWindow):
                 inventoryHash = str(messageList.item(row, 3).data(Qt.UserRole).toPyObject())
                 messageList.removeRow(row)
             elif inventoryHash is not None:
-                for i in range(messageList.rowCount() - 1, -1, -1):
+                for i in xrange(messageList.rowCount() - 1, -1, -1):
                     if messageList.item(i, 3).data(Qt.UserRole).toPyObject() == inventoryHash:
                         messageList.removeRow(i)
             elif ackData is not None:
-                for i in range(messageList.rowCount() - 1, -1, -1):
+                for i in xrange(messageList.rowCount() - 1, -1, -1):
                     if messageList.item(i, 3).data(Qt.UserRole).toPyObject() == ackData:
                         messageList.removeRow(i)
 
@@ -2958,7 +2958,7 @@ class MyForm(settingsmixin.SMainWindow):
     def on_action_AddressBookClipboard(self):
         fullStringOfAddresses = ''
         listOfSelectedRows = {}
-        for i in range(len(self.ui.tableWidgetAddressBook.selectedIndexes())):
+        for i in xrange(len(self.ui.tableWidgetAddressBook.selectedIndexes())):
             listOfSelectedRows[
                 self.ui.tableWidgetAddressBook.selectedIndexes()[i].row()] = 0
         for currentRow in listOfSelectedRows:
@@ -2973,7 +2973,7 @@ class MyForm(settingsmixin.SMainWindow):
 
     def on_action_AddressBookSend(self):
         listOfSelectedRows = {}
-        for i in range(len(self.ui.tableWidgetAddressBook.selectedIndexes())):
+        for i in xrange(len(self.ui.tableWidgetAddressBook.selectedIndexes())):
             listOfSelectedRows[
                 self.ui.tableWidgetAddressBook.selectedIndexes()[i].row()] = 0
         for currentRow in listOfSelectedRows:
@@ -2996,7 +2996,7 @@ class MyForm(settingsmixin.SMainWindow):
 
     def on_action_AddressBookSubscribe(self):
         listOfSelectedRows = {}
-        for i in range(len(self.ui.tableWidgetAddressBook.selectedIndexes())):
+        for i in xrange(len(self.ui.tableWidgetAddressBook.selectedIndexes())):
             listOfSelectedRows[self.ui.tableWidgetAddressBook.selectedIndexes()[i].row()] = 0
         for currentRow in listOfSelectedRows:
             addressAtCurrentRow = str(self.ui.tableWidgetAddressBook.item(currentRow,1).text())
@@ -3649,7 +3649,7 @@ class MyForm(settingsmixin.SMainWindow):
         self.rerenderMessagelistFromLabels()
         self.rerenderMessagelistToLabels()
         completerList = self.ui.lineEditTo.completer().model().stringList()
-        for i in range(len(completerList)):
+        for i in xrange(len(completerList)):
             if str(completerList[i]).endswith(" <" + item.address + ">"):
                 completerList[i] = item.label + " <" + item.address + ">"
         self.ui.lineEditTo.completer().model().setStringList(completerList)
@@ -3827,7 +3827,7 @@ class settingsDialog(QtGui.QDialog):
         self.ui.comboBoxOpenCL.addItem("None")
         self.ui.comboBoxOpenCL.addItems(openclpow.vendors)
         self.ui.comboBoxOpenCL.setCurrentIndex(0)
-        for i in range(self.ui.comboBoxOpenCL.count()):
+        for i in xrange(self.ui.comboBoxOpenCL.count()):
             if self.ui.comboBoxOpenCL.itemText(i) == BMConfigParser().safeGet('bitmessagesettings', 'opencl'):
                 self.ui.comboBoxOpenCL.setCurrentIndex(i)
                 break

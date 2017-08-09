@@ -69,7 +69,7 @@ def _doFastPoW(target, initialHash):
 
     pool = Pool(processes=pool_size)
     result = []
-    for i in range(pool_size):
+    for i in xrange(pool_size):
         result.append(pool.apply_async(_pool_worker, args=(i, initialHash, target, pool_size)))
 
     while True:
@@ -80,7 +80,7 @@ def _doFastPoW(target, initialHash):
             except:
                 pass
             raise StopIteration("Interrupted")
-        for i in range(pool_size):
+        for i in xrange(pool_size):
             if result[i].ready():
                 try:
                     result[i].successful()

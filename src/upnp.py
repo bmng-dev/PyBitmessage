@@ -88,7 +88,7 @@ class Router:
 
         row = ssdpResponse.split('\r\n')
         header = {}
-        for i in range(1, len(row)):
+        for i in xrange(1, len(row)):
             part = row[i].split(': ')
             if len(part) == 2:
                 header[part[0].lower()] = part[1]
@@ -271,7 +271,7 @@ class uPnPThread(threading.Thread, StoppableThread):
             logger.exception("UPnP send query failed")
 
     def createPortMapping(self, router):
-        for i in range(50):
+        for i in xrange(50):
             try:
                 routerIP, = unpack('>I', socket.inet_aton(router.address))
                 localIP = self.localIP

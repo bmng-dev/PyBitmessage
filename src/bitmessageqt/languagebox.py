@@ -34,7 +34,7 @@ class LanguageBox(QtGui.QComboBox):
                 self.addItem(localeShort, localeShort)
             else:
                 self.addItem(locale.nativeLanguageName(), localeShort)
-        for i in range(self.count()):
+        for i in xrange(self.count()):
             if self.itemData(i) == configuredLocale:
                 self.setCurrentIndex(i)
                 break

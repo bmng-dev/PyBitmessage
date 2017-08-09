@@ -178,7 +178,7 @@ class addressGenerator(threading.Thread, StoppableThread):
                 listOfNewAddressesToSendOutThroughTheAPI = [
                 ]  # We fill out this list no matter what although we only need it if we end up passing the info to the API.
 
-                for i in range(numberOfAddressesToMake):
+                for i in xrange(numberOfAddressesToMake):
                     # This next section is a little bit strange. We're going to generate keys over and over until we
                     # find one that has a RIPEMD hash that starts with either \x00 or \x00\x00. Then when we pack them
                     # into a Bitmessage address, we won't store the \x00 or
