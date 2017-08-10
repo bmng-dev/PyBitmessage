@@ -266,7 +266,7 @@ class receiveDataThread(threading.Thread):
         if sys.version_info >= (2, 7, 9):
             logger.debug("TLS protocol version: %s", self.sock.version())
 
-    def peerValidityChecks(self):
+    def validatePeer(self):
         if self.remoteProtocolVersion < 3:
             self.sendDataThreadQueue.put((0, 'sendRawData',protocol.assembleErrorMessage(
                 fatal=2, errorText="Your is using an old protocol. Closing connection.")))
@@ -292,6 +292,9 @@ class receiveDataThread(threading.Thread):
                 fatal=2, errorText="We don't have shared stream interests. Closing connection.")))
             logger.debug ('Closed connection to ' + str(self.peer) + ' because there is no overlapping interest in streams.')
             return False
+        if self.remoteNodeId == protocol.ServerNodeId:
+            logger.debug('Closing connection to myself: ' + str(self.peer))
+            return False
         return True
         
     def connectionFullyEstablished(self):
@@ -307,12 +310,6 @@ class receiveDataThread(threading.Thread):
                 logger.error("SSL socket handshake failed, shutting down connection", exc_info=(type(ex), ex, None))
                 self.sendDataThreadQueue.put((0, 'shutdown', None))
                 return
-
-        if self.peerValidityChecks() == False:
-            time.sleep(2)
-            self.sendDataThreadQueue.put((0, 'shutdown','no data'))
-            self.checkTimeOffsetNotification()
-            return
 
         self.connectionIsOrWasFullyEstablished = True
         shared.timeOffsetWrongCount = 0
@@ -694,15 +691,19 @@ class receiveDataThread(threading.Thread):
         # find shared streams
         self.streamNumber = sorted(set(state.streamsInWhichIAmParticipating).intersection(self.remoteStreams))
 
+        self.remoteNodeId, = unpack('>Q', data[72:80])
+
+        if not self.validatePeer():
+            time.sleep(2)
+            self.sendDataThreadQueue.put((0, 'shutdown','no data'))
+            self.checkTimeOffsetNotification()
+            return
+
         shared.connectedHostsList[
             self.hostIdent] = 1  # We use this data structure to not only keep track of what hosts we are connected to so that we don't try to connect to them again, but also to list the connections count on the Network Status tab.
+
         self.sendDataThreadQueue.put((0, 'setStreamNumber', self.remoteStreams))
-        self.remoteNodeId, = unpack('>Q', data[72:80])
-        if self.remoteNodeId == protocol.ServerNodeId:
-            self.sendDataThreadQueue.put((0, 'shutdown','no data'))
-            logger.debug('Closing connection to myself: ' + str(self.peer))
-            return
-        
+
         # The other peer's protocol version is of interest to the sendDataThread but we learn of it
         # in this version message. Let us inform the sendDataThread.
         self.sendDataThreadQueue.put((0, 'setRemoteProtocolVersion', self.remoteProtocolVersion))
