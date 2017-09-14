@@ -344,7 +344,7 @@ class ECC:
                 raise Exception("[OpenSSL] EC_KEY_check_key FAIL ...")
 
             if OpenSSL._hexversion > 0x10100000 and not OpenSSL._libreSSL:
-                OpenSSL.EVP_MD_CTX_new(md_ctx)
+                pass
             else:
                 OpenSSL.EVP_MD_CTX_init(md_ctx)
             OpenSSL.EVP_DigestInit_ex(md_ctx, digest_alg(), None)
@@ -406,7 +406,7 @@ class ECC:
             if (OpenSSL.EC_KEY_check_key(key)) == 0:
                 raise Exception("[OpenSSL] EC_KEY_check_key FAIL ...")
             if OpenSSL._hexversion > 0x10100000 and not OpenSSL._libreSSL:
-                OpenSSL.EVP_MD_CTX_new(md_ctx)
+                pass
             else:
                 OpenSSL.EVP_MD_CTX_init(md_ctx)
             OpenSSL.EVP_DigestInit_ex(md_ctx, digest_alg(), None)
