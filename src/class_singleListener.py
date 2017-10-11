@@ -53,15 +53,13 @@ class singleListener(StoppableThread):
         
     def stopThread(self):
         super(singleListener, self).stopThread()
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        for ip in ('127.0.0.1', BMConfigParser().get('bitmessagesettings', 'onionbindip')):
-            try:
-                s.connect((ip, BMConfigParser().getint('bitmessagesettings', 'port')))
-                s.shutdown(socket.SHUT_RDWR)
-                s.close()
-                break
-            except:
-                pass
+        sock = getattr(self, 'socket', None)
+        if not sock:
+            return
+        try:
+            sock.shutdown(socket.SHUT_RD)
+        finally:
+            sock.close()
 
     def run(self):
         # If there is a trusted peer then we don't want to accept
@@ -101,6 +99,8 @@ class singleListener(StoppableThread):
             else:
                 raise
 
+        self.socket = sock
+
         # regexp to match an IPv4-mapped IPv6 address
         mappedAddressRegexp = re.compile(r'^::ffff:([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$')
 
@@ -120,9 +120,12 @@ class singleListener(StoppableThread):
                 self.wait(10)
 
             while not self.stop_requested:
+                socketObject = None
                 try:
                     socketObject, sockaddr = sock.accept()
                 except socket.error as e:
+                    if e.errno == errno.EINVAL:
+                        break
                     if isinstance(e.args, tuple) and \
                         e.args[0] in (errno.EINTR,):
                         continue
@@ -149,6 +152,16 @@ class singleListener(StoppableThread):
                     logger.info('We are already connected to ' + str(HOST) + '. Ignoring connection.')
                 else:
                     break
+
+            if self.stop_requested:
+                if socketObject:
+                    try:
+                        socketObject.shutdown(socket.SHUT_RDWR)
+                    except:
+                        logger.exception()
+                    finally:
+                        socketObject.close()
+                break
 
             sendDataThreadQueue = Queue.Queue() # Used to submit information to the send data thread for this connection.
             socketObject.settimeout(20)
