@@ -1046,17 +1046,16 @@ class MySimpleXMLRPCRequestHandler(SimpleXMLRPCRequestHandler):
 class singleAPI(StoppableThread):
     def stopThread(self):
         super(singleAPI, self).stopThread()
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server = getattr(self, 'server', None)
+        if not server:
+            return
         try:
-            s.connect((BMConfigParser().get('bitmessagesettings', 'apiinterface'), BMConfigParser().getint(
-                'bitmessagesettings', 'apiport')))
-            s.shutdown(socket.SHUT_RDWR)
-            s.close()
-        except:
-            pass
+            server.socket.shutdown(socket.SHUT_RD)
+        finally:
+            server.server_close()
 
     def run(self):
-        se = SimpleXMLRPCServer((BMConfigParser().get('bitmessagesettings', 'apiinterface'), BMConfigParser().getint(
+        self.server = se = SimpleXMLRPCServer((BMConfigParser().get('bitmessagesettings', 'apiinterface'), BMConfigParser().getint(
             'bitmessagesettings', 'apiport')), MySimpleXMLRPCRequestHandler, True, True)
         se.register_introspection_functions()
         while not self.stop_requested:
