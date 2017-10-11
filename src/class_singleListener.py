@@ -26,9 +26,6 @@ logger = logging.getLogger(__name__)
 
 
 class singleListener(StoppableThread):
-    def setup(self, selfInitiatedConnections):
-        self.selfInitiatedConnections = selfInitiatedConnections
-
     def _createListenSocket(self, family):
         HOST = ''  # Symbolic name meaning all available interfaces
         # If not sockslisten, but onionhostname defined, only listen on localhost
@@ -174,7 +171,7 @@ class singleListener(StoppableThread):
             rd = receiveDataThread()
             rd.daemon = True  # close the main program even if there are threads left
             rd.setup(
-                socketObject, HOST, PORT, -1, self.selfInitiatedConnections, sendDataThreadQueue, sd.objectHashHolderInstance)
+                socketObject, HOST, PORT, -1, sendDataThreadQueue, sd.objectHashHolderInstance)
             rd.start()
 
             logger.info('connected to ' + HOST + ' during INCOMING request.')

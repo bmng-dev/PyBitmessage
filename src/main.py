@@ -52,7 +52,7 @@ import helper_generic
 
 def connectToStream(streamNumber):
     state.streamsInWhichIAmParticipating.append(streamNumber)
-    selfInitiatedConnections[streamNumber] = {}
+    shared.selfInitiatedConnections.setdefault(streamNumber, {})
 
     if helper_startup.isOurOperatingSystemLimitedToHavingVeryFewHalfOpenConnections():
         # Some XP and Vista systems can only have 10 outgoing connections at a time.
@@ -76,7 +76,7 @@ def connectToStream(streamNumber):
 
     for i in xrange(maximumNumberOfHalfOpenConnections):
         a = outgoingSynSender()
-        a.setup(streamNumber, selfInitiatedConnections)
+        a.setup(streamNumber)
         a.start()
 
 def _fixWinsock():
@@ -129,9 +129,6 @@ def _fixWinsock():
         socket.IPPROTO_IPV6 = 41
     if not hasattr(socket, 'IPV6_V6ONLY'):
         socket.IPV6_V6ONLY = 27
-
-# This is a list of current connections (the thread pointers at least)
-selfInitiatedConnections = {}
 
 if shared.useVeryEasyProofOfWorkForTesting:
     defaults.networkDefaultProofOfWorkNonceTrialsPerByte = int(
@@ -202,7 +199,6 @@ class Main:
         connectToStream(1)
 
         singleListenerThread = singleListener()
-        singleListenerThread.setup(selfInitiatedConnections)
         singleListenerThread.daemon = True  # close the main program even if there are threads left
         singleListenerThread.start()
         

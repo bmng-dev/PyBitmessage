@@ -57,7 +57,6 @@ class receiveDataThread(threading.Thread):
         HOST,
         port,
         streamNumber,
-        selfInitiatedConnections,
         sendDataThreadQueue,
         objectHashHolderInstance):
         
@@ -66,7 +65,6 @@ class receiveDataThread(threading.Thread):
         self.name = "receiveData-" + self.peer.host.replace(":", ".") # ":" log parser field separator
         self.streamNumber = state.streamsInWhichIAmParticipating
         self.remoteStreams = []
-        self.selfInitiatedConnections = selfInitiatedConnections
         self.sendDataThreadQueue = sendDataThreadQueue # used to send commands and data to the sendDataThread
         self.hostIdent = self.peer.port if ".onion" in BMConfigParser().get('bitmessagesettings', 'onionhostname') and protocol.checkSocksIP(self.peer.host) else self.peer.host
         shared.connectedHostsList[
@@ -78,7 +76,7 @@ class receiveDataThread(threading.Thread):
         else:
             self.initiatedConnection = True
             for stream in self.streamNumber:
-                self.selfInitiatedConnections[stream][self] = 0
+                shared.selfInitiatedConnections.setdefault(stream, {})[self] = 0
         self.objectHashHolderInstance = objectHashHolderInstance
         self.downloadQueue = PendingDownloadQueue()
         self.startTime = time.time()
@@ -118,15 +116,10 @@ class receiveDataThread(threading.Thread):
                 logger.error('Protocol violation: %s', ex.message)
                 break
 
-        try:
-            for stream in self.streamNumber:
-                try:
-                    del self.selfInitiatedConnections[stream][self]
-                except KeyError:
-                    pass
-            logger.debug('removed self (a receiveDataThread) from selfInitiatedConnections')
-        except:
-            pass
+        for stream in self.streamNumber:
+            shared.selfInitiatedConnections.get(stream, {}).pop(self, 0)
+        logger.debug('removed self (a receiveDataThread) from selfInitiatedConnections')
+
         self.sendDataThreadQueue.put((0, 'shutdown','no data')) # commands the corresponding sendDataThread to shut itself down.
         try:
             del shared.connectedHostsList[self.hostIdent]

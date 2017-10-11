@@ -31,9 +31,8 @@ class outgoingSynSender(StoppableThread):
         super(outgoingSynSender, self).__init__()
         random.seed()
 
-    def setup(self, streamNumber, selfInitiatedConnections):
+    def setup(self, streamNumber):
         self.streamNumber = streamNumber
-        self.selfInitiatedConnections = selfInitiatedConnections
 
     def _getPeer(self):
         # If the user has specified a trusted peer then we'll only
@@ -91,7 +90,7 @@ class outgoingSynSender(StoppableThread):
         while BMConfigParser().safeGetBoolean('bitmessagesettings', 'sendoutgoingconnections') and not self.stop_requested:
             self.name = "outgoingSynSender"
             maximumConnections = 1 if state.trustedPeer else BMConfigParser().safeGetInt('bitmessagesettings', 'maxoutboundconnections')
-            while len(self.selfInitiatedConnections[self.streamNumber]) >= maximumConnections and not self.stop_requested:
+            while len(shared.selfInitiatedConnections.get(self.streamNumber, {})) >= maximumConnections and not self.stop_requested:
                 self.wait(10)
             if self.stop_requested:
                 break
@@ -208,7 +207,6 @@ class outgoingSynSender(StoppableThread):
                          peer.host, 
                          peer.port, 
                          self.streamNumber,
-                         self.selfInitiatedConnections, 
                          sendDataThreadQueue,
                          sd.objectHashHolderInstance)
                 rd.start()
