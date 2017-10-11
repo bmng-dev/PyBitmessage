@@ -73,10 +73,17 @@ class outgoingSynSender(StoppableThread):
         
     def stopThread(self):
         super(outgoingSynSender, self).stopThread()
+        sock = getattr(self, 'sock', None)
+        if not sock or isinstance(sock, socket._closedsocket):
+            return
         try:
-            self.sock.shutdown(socket.SHUT_RDWR)
-        except:
-            pass
+            sock.settimeout(1.0)
+            try:
+                sock.shutdown(socket.SHUT_RDWR)
+            finally:
+                sock.close()
+        except AttributeError:
+            return
 
     def run(self):
         while BMConfigParser().safeGetBoolean('bitmessagesettings', 'dontconnect') and not self.stop_requested:
