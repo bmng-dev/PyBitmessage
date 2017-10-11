@@ -3,7 +3,6 @@ from __future__ import division
 import hashlib
 import logging
 import random
-import threading
 import time
 from binascii import hexlify, unhexlify
 from struct import pack
@@ -41,13 +40,7 @@ def sizeof_fmt(num, suffix='h/s'):
         num /= 1024.0
     return "%.1f%s%s" % (num, 'Yi', suffix)
 
-class singleWorker(threading.Thread, StoppableThread):
-
-    def __init__(self):
-        # QThread.__init__(self, parent)
-        threading.Thread.__init__(self, name="singleWorker")
-        self.initStop()
-
+class singleWorker(StoppableThread):
     def stopThread(self):
         try:
             queues.workerQueue.put(("stopThread", "data"))
@@ -57,9 +50,9 @@ class singleWorker(threading.Thread, StoppableThread):
 
     def run(self):
 
-        while not state.sqlReady and state.shutdown == 0:
-            self.stop.wait(2)
-        if state.shutdown > 0:
+        while not state.sqlReady and not self.stop_requested:
+            self.wait(2)
+        if self.stop_requested:
             return
         
         # Initialize the neededPubkeys dictionary.
@@ -85,10 +78,10 @@ class singleWorker(threading.Thread, StoppableThread):
             logger.info('Watching for ackdata ' + hexlify(ackdata))
             shared.ackdataForWhichImWatching[ackdata] = 0
 
-        self.stop.wait(
+        self.wait(
             10)  # give some time for the GUI to start before we start on existing POW tasks.
 
-        if state.shutdown == 0:
+        if not self.stop_requested:
             # just in case there are any pending tasks for msg
             # messages that have yet to be sent.
             queues.workerQueue.put(('sendmessage', ''))
@@ -96,7 +89,7 @@ class singleWorker(threading.Thread, StoppableThread):
             # that have yet to be sent.
             queues.workerQueue.put(('sendbroadcast', ''))
 
-        while state.shutdown == 0:
+        while not self.stop_requested:
             self.busy = 0
             command, data = queues.workerQueue.get()
             self.busy = 1

@@ -3,8 +3,6 @@ import logging
 import Queue
 import re
 import socket
-import threading
-import time
 
 import knownnodes
 import protocol
@@ -27,12 +25,7 @@ logger = logging.getLogger(__name__)
 # (within the recversion function of the recieveData thread)
 
 
-class singleListener(threading.Thread, StoppableThread):
-
-    def __init__(self):
-        threading.Thread.__init__(self, name="singleListener")
-        self.initStop()
-
+class singleListener(StoppableThread):
     def setup(self, selfInitiatedConnections):
         self.selfInitiatedConnections = selfInitiatedConnections
 
@@ -76,8 +69,8 @@ class singleListener(threading.Thread, StoppableThread):
         if state.trustedPeer:
             return
 
-        while BMConfigParser().safeGetBoolean('bitmessagesettings', 'dontconnect') and state.shutdown == 0:
-            self.stop.wait(1)
+        while BMConfigParser().safeGetBoolean('bitmessagesettings', 'dontconnect') and not self.stop_requested:
+            self.wait(1)
         knownnodes.dns()
         # We typically don't want to accept incoming connections if the user is using a
         # SOCKS proxy, unless they have configured otherwise. If they eventually select
@@ -87,8 +80,8 @@ class singleListener(threading.Thread, StoppableThread):
         while BMConfigParser().get('bitmessagesettings', 'socksproxytype')[0:5] == 'SOCKS' and \
             (not BMConfigParser().getboolean('bitmessagesettings', 'sockslisten') and \
             ".onion" not in BMConfigParser().get('bitmessagesettings', 'onionhostname')) and \
-            state.shutdown == 0:
-            self.stop.wait(5)
+            not self.stop_requested:
+            self.wait(5)
 
         logger.info('Listening for incoming connections.')
 
@@ -111,29 +104,29 @@ class singleListener(threading.Thread, StoppableThread):
         # regexp to match an IPv4-mapped IPv6 address
         mappedAddressRegexp = re.compile(r'^::ffff:([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$')
 
-        while state.shutdown == 0:
+        while not self.stop_requested:
             # We typically don't want to accept incoming connections if the user is using a
             # SOCKS proxy, unless they have configured otherwise. If they eventually select
             # proxy 'none' or configure SOCKS listening then this will start listening for
             # connections.
-            while BMConfigParser().get('bitmessagesettings', 'socksproxytype')[0:5] == 'SOCKS' and not BMConfigParser().getboolean('bitmessagesettings', 'sockslisten') and ".onion" not in BMConfigParser().get('bitmessagesettings', 'onionhostname') and state.shutdown == 0:
-                self.stop.wait(10)
+            while BMConfigParser().get('bitmessagesettings', 'socksproxytype')[0:5] == 'SOCKS' and not BMConfigParser().getboolean('bitmessagesettings', 'sockslisten') and ".onion" not in BMConfigParser().get('bitmessagesettings', 'onionhostname') and not self.stop_requested:
+                self.wait(10)
             while len(shared.connectedHostsList) > \
                 BMConfigParser().safeGetInt("bitmessagesettings", "maxtotalconnections", 200) + \
                 BMConfigParser().safeGetInt("bitmessagesettings", "maxbootstrapconnections", 20) \
-                and state.shutdown == 0:
+                and not self.stop_requested:
                 logger.info('We are connected to too many people. Not accepting further incoming connections for ten seconds.')
 
-                self.stop.wait(10)
+                self.wait(10)
 
-            while state.shutdown == 0:
+            while not self.stop_requested:
                 try:
                     socketObject, sockaddr = sock.accept()
                 except socket.error as e:
                     if isinstance(e.args, tuple) and \
                         e.args[0] in (errno.EINTR,):
                         continue
-                    time.wait(1)
+                    self.wait(1)
                     continue
 
                 (HOST, PORT) = sockaddr[0:2]

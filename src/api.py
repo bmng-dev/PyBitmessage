@@ -6,7 +6,6 @@ import hashlib
 import json
 import logging
 import socket
-import threading
 import time
 from binascii import hexlify, unhexlify
 from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler, SimpleXMLRPCServer
@@ -42,12 +41,6 @@ class APIError(Exception):
         self.error_message = error_message
     def __str__(self):
         return "API Error %04i: %s" % (self.error_number, self.error_message)
-
-
-class StoppableXMLRPCServer(SimpleXMLRPCServer):
-    def serve_forever(self):
-        while state.shutdown == 0:
-            self.handle_request()
 
 
 # This is one of several classes that constitute the API
@@ -1050,11 +1043,7 @@ class MySimpleXMLRPCRequestHandler(SimpleXMLRPCRequestHandler):
 
 
 # This thread, of which there is only one, runs the API.
-class singleAPI(threading.Thread, StoppableThread):
-    def __init__(self):
-        threading.Thread.__init__(self, name="singleAPI")
-        self.initStop()
-
+class singleAPI(StoppableThread):
     def stopThread(self):
         super(singleAPI, self).stopThread()
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -1067,7 +1056,8 @@ class singleAPI(threading.Thread, StoppableThread):
             pass
 
     def run(self):
-        se = StoppableXMLRPCServer((BMConfigParser().get('bitmessagesettings', 'apiinterface'), BMConfigParser().getint(
+        se = SimpleXMLRPCServer((BMConfigParser().get('bitmessagesettings', 'apiinterface'), BMConfigParser().getint(
             'bitmessagesettings', 'apiport')), MySimpleXMLRPCRequestHandler, True, True)
         se.register_introspection_functions()
-        se.serve_forever()
+        while not self.stop_requested:
+            se.handle_request()

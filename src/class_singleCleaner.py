@@ -38,12 +38,7 @@ resends msg messages in 5 days (then 10 days, then 20 days, etc...)
 """
 
 
-class singleCleaner(threading.Thread, StoppableThread):
-
-    def __init__(self):
-        threading.Thread.__init__(self, name="singleCleaner")
-        self.initStop()
-
+class singleCleaner(StoppableThread):
     def run(self):
         timeWeLastClearedInventoryAndPubkeysTables = 0
         try:
@@ -53,10 +48,10 @@ class singleCleaner(threading.Thread, StoppableThread):
             shared.maximumLengthOfTimeToBotherResendingMessages = float('inf')
 
         # initial wait
-        if state.shutdown == 0:
-            self.stop.wait(300)
+        if not self.stop_requested:
+            self.wait(300)
 
-        while state.shutdown == 0:
+        while not self.stop_requested:
             queues.UISignalQueue.put((
                 'updateStatusBar', 'Doing housekeeping (Flushing inventory in memory to disk...)'))
             Inventory().flush()
@@ -85,7 +80,7 @@ class singleCleaner(threading.Thread, StoppableThread):
                 for row in queryreturn:
                     if len(row) < 2:
                         logger.error('Something went wrong in the singleCleaner thread: a query did not return the requested fields. ' + repr(row))
-                        self.stop.wait(3)
+                        self.wait(3)
                         break
                     toAddress, ackData, status = row
                     if status == 'awaitingpubkey':
@@ -122,8 +117,8 @@ class singleCleaner(threading.Thread, StoppableThread):
 
             # TODO: cleanup pending upload / download
 
-            if state.shutdown == 0:
-                self.stop.wait(300)
+            if not self.stop_requested:
+                self.wait(300)
 
 
 def resendPubkeyRequest(address):

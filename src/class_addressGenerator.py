@@ -1,7 +1,6 @@
 import hashlib
 import logging
 import sys
-import threading
 import time
 from binascii import hexlify
 
@@ -9,7 +8,6 @@ import defaults
 import highlevelcrypto
 import queues
 import shared
-import state
 import tr
 from addresses import decodeAddress, encodeAddress, encodeVarint
 from bmconfigparser import BMConfigParser
@@ -21,13 +19,7 @@ from pyelliptic.openssl import OpenSSL
 logger = logging.getLogger(__name__)
 
 
-class addressGenerator(threading.Thread, StoppableThread):
-
-    def __init__(self):
-        # QThread.__init__(self, parent)
-        threading.Thread.__init__(self, name="addressGenerator")
-        self.initStop()
-        
+class addressGenerator(StoppableThread):
     def stopThread(self):
         try:
             queues.addressGeneratorQueue.put(("stopThread", "data"))
@@ -36,7 +28,7 @@ class addressGenerator(threading.Thread, StoppableThread):
         super(addressGenerator, self).stopThread()
 
     def run(self):
-        while state.shutdown == 0:
+        while not self.stop_requested:
             queueValue = queues.addressGeneratorQueue.get()
             nonceTrialsPerByte = 0
             payloadLengthExtraBytes = 0

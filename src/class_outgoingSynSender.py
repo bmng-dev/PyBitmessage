@@ -3,7 +3,6 @@ import logging
 import Queue
 import random
 import socket
-import threading
 import time
 
 import socks
@@ -26,11 +25,10 @@ logger = logging.getLogger(__name__)
 # For each stream to which we connect, several outgoingSynSender threads
 # will exist and will collectively create 8 connections with peers.
 
-class outgoingSynSender(threading.Thread, StoppableThread):
+class outgoingSynSender(StoppableThread):
 
     def __init__(self):
-        threading.Thread.__init__(self, name="outgoingSynSender")
-        self.initStop()
+        super(outgoingSynSender, self).__init__()
         random.seed()
 
     def setup(self, streamNumber, selfInitiatedConnections):
@@ -46,13 +44,13 @@ class outgoingSynSender(threading.Thread, StoppableThread):
                 peer = state.trustedPeer
                 knownnodes.knownNodes[self.streamNumber][peer] = time.time()
         else:
-            while not self._stopped:
+            while not self.stop_requested:
                 try:
                     with knownnodes.knownNodesLock:
                         peer, = random.sample(knownnodes.knownNodes[self.streamNumber], 1)
                         priority = (183600 - (time.time() - knownnodes.knownNodes[self.streamNumber][peer])) / 183600 # 2 days and 3 hours
                 except ValueError: # no known nodes
-                    self.stop.wait(1)
+                    self.wait(1)
                     continue
                 if BMConfigParser().get('bitmessagesettings', 'socksproxytype') != 'none':
                     if peer.host.find(".onion") == -1:
@@ -67,7 +65,7 @@ class outgoingSynSender(threading.Thread, StoppableThread):
                     priority = 0.001
                 if (random.random() <=  priority):
                     break
-                self.stop.wait(0.01) # prevent CPU hogging if something is broken
+                self.wait(0.01) # prevent CPU hogging if something is broken
         try:
             return peer
         except NameError:
@@ -81,21 +79,21 @@ class outgoingSynSender(threading.Thread, StoppableThread):
             pass
 
     def run(self):
-        while BMConfigParser().safeGetBoolean('bitmessagesettings', 'dontconnect') and not self._stopped:
-            self.stop.wait(2)
-        while BMConfigParser().safeGetBoolean('bitmessagesettings', 'sendoutgoingconnections') and not self._stopped:
+        while BMConfigParser().safeGetBoolean('bitmessagesettings', 'dontconnect') and not self.stop_requested:
+            self.wait(2)
+        while BMConfigParser().safeGetBoolean('bitmessagesettings', 'sendoutgoingconnections') and not self.stop_requested:
             self.name = "outgoingSynSender"
             maximumConnections = 1 if state.trustedPeer else BMConfigParser().safeGetInt('bitmessagesettings', 'maxoutboundconnections')
-            while len(self.selfInitiatedConnections[self.streamNumber]) >= maximumConnections and not self._stopped:
-                self.stop.wait(10)
-            if state.shutdown:
+            while len(self.selfInitiatedConnections[self.streamNumber]) >= maximumConnections and not self.stop_requested:
+                self.wait(10)
+            if self.stop_requested:
                 break
             peer = self._getPeer()
             while peer in shared.alreadyAttemptedConnectionsList or peer.host in shared.connectedHostsList:
                 # print 'choosing new sample'
                 peer = self._getPeer()
-                self.stop.wait(1)
-                if self._stopped:
+                self.wait(1)
+                if self.stop_requested:
                     break
                 # Clear out the shared.alreadyAttemptedConnectionsList every half
                 # hour so that this program will again attempt a connection
@@ -106,7 +104,7 @@ class outgoingSynSender(threading.Thread, StoppableThread):
                         shared.alreadyAttemptedConnectionsListResetTime = int(
                             time.time())
             shared.alreadyAttemptedConnectionsList[peer] = 0
-            if self._stopped:
+            if self.stop_requested:
                 break
             self.name = "outgoingSynSender-" + peer.host.replace(":", ".") # log parser field separator
             address_family = socket.AF_INET
@@ -187,7 +185,7 @@ class outgoingSynSender(threading.Thread, StoppableThread):
 
             try:
                 self.sock.connect((peer.host, peer.port))
-                if self._stopped:
+                if self.stop_requested:
                     self.sock.shutdown(socket.SHUT_RDWR)
                     self.sock.close()
                     return
@@ -219,7 +217,7 @@ class outgoingSynSender(threading.Thread, StoppableThread):
                         tr._translate(
                             "MainWindow", "Problem communicating with proxy: %1. Please check your network settings.").arg(str(err[0][1]))
                         ))
-                    self.stop.wait(1)
+                    self.wait(1)
                     continue
                 elif shared.verbose >= 2:
                     logger.debug('Could NOT connect to ' + str(peer) + ' during outgoing attempt. ' + str(err))
@@ -285,4 +283,4 @@ class outgoingSynSender(threading.Thread, StoppableThread):
 
             except Exception as err:
                 logger.exception('An exception has occurred in the outgoingSynSender thread that was not caught by other exception types:')
-            self.stop.wait(0.1)
+            self.wait(0.1)

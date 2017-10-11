@@ -3,14 +3,12 @@
 import httplib
 import logging
 import socket
-import threading
 import time
 from random import randint
 from struct import unpack
 
 import queues
 import shared
-import state
 import tr
 from bmconfigparser import BMConfigParser
 from helper_threading import StoppableThread
@@ -172,7 +170,7 @@ class Router:
                 raise UPnPError("Unable to parse SOAP error: %s" %(respData))
         return resp
 
-class uPnPThread(threading.Thread, StoppableThread):
+class uPnPThread(StoppableThread):
     SSDP_ADDR = "239.255.255.250"
     GOOGLE_DNS = "8.8.8.8"
     SSDP_PORT = 1900
@@ -180,7 +178,7 @@ class uPnPThread(threading.Thread, StoppableThread):
     SSDP_ST = "urn:schemas-upnp-org:device:InternetGatewayDevice:1"
 
     def __init__ (self):
-        threading.Thread.__init__(self, name="uPnPThread")
+        super(uPnPThread, self).__init__()
         self.localPort = BMConfigParser().getint('bitmessagesettings', 'port')
         try:
             self.extPort = BMConfigParser().getint('bitmessagesettings', 'extport')
@@ -193,13 +191,12 @@ class uPnPThread(threading.Thread, StoppableThread):
         self.sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 2)
         self.sock.settimeout(5)
         self.sendSleep = 60
-        self.initStop()
 
     def run(self):
         logger.debug("Starting UPnP thread")
         logger.debug("Local IP: %s", self.localIP)
         lastSent = 0
-        while state.shutdown == 0 and BMConfigParser().safeGetBoolean('bitmessagesettings', 'upnp'):
+        while not self.stop_requested and BMConfigParser().safeGetBoolean('bitmessagesettings', 'upnp'):
             if time.time() - lastSent > self.sendSleep and len(self.routers) == 0:
                 try:
                     self.sendSearchRouter()
@@ -207,7 +204,7 @@ class uPnPThread(threading.Thread, StoppableThread):
                     pass
                 lastSent = time.time()
             try:
-                while state.shutdown == 0 and BMConfigParser().safeGetBoolean('bitmessagesettings', 'upnp'):
+                while not self.stop_requested and BMConfigParser().safeGetBoolean('bitmessagesettings', 'upnp'):
                     resp,(ip,port) = self.sock.recvfrom(1000)
                     if resp is None:
                         continue
