@@ -27,11 +27,9 @@ logger = logging.getLogger(__name__)
 
 class outgoingSynSender(StoppableThread):
 
-    def __init__(self):
+    def __init__(self, streamNumber):
         super(outgoingSynSender, self).__init__()
         random.seed()
-
-    def setup(self, streamNumber):
         self.streamNumber = streamNumber
 
     def _getPeer(self):
@@ -197,18 +195,11 @@ class outgoingSynSender(StoppableThread):
                     return
                 sendDataThreadQueue = Queue.Queue() # Used to submit information to the send data thread for this connection. 
 
-                sd = sendDataThread(sendDataThreadQueue)
-                sd.setup(self.sock, peer.host, peer.port, self.streamNumber)
+                sd = sendDataThread(sendDataThreadQueue, self.sock, peer.host, peer.port, self.streamNumber)
                 sd.start()
 
-                rd = receiveDataThread()
+                rd = receiveDataThread(self.sock, peer.host, peer.port, self.streamNumber, sendDataThreadQueue, sd.objectHashHolderInstance)
                 rd.daemon = True  # close the main program even if there are threads left
-                rd.setup(self.sock, 
-                         peer.host, 
-                         peer.port, 
-                         self.streamNumber,
-                         sendDataThreadQueue,
-                         sd.objectHashHolderInstance)
                 rd.start()
 
                 sd.sendVersionMessage()

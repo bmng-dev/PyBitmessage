@@ -163,15 +163,11 @@ class singleListener(StoppableThread):
             sendDataThreadQueue = Queue.Queue() # Used to submit information to the send data thread for this connection.
             socketObject.settimeout(20)
 
-            sd = sendDataThread(sendDataThreadQueue)
-            sd.setup(
-                socketObject, HOST, PORT, -1)
+            sd = sendDataThread(sendDataThreadQueue, socketObject, HOST, PORT, -1)
             sd.start()
 
-            rd = receiveDataThread()
+            rd = receiveDataThread(socketObject, HOST, PORT, -1, sendDataThreadQueue, sd.objectHashHolderInstance)
             rd.daemon = True  # close the main program even if there are threads left
-            rd.setup(
-                socketObject, HOST, PORT, -1, sendDataThreadQueue, sd.objectHashHolderInstance)
             rd.start()
 
             logger.info('connected to ' + HOST + ' during INCOMING request.')

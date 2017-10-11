@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 # receiveDataThread).
 class sendDataThread(threading.Thread):
 
-    def __init__(self, sendDataThreadQueue):
+    def __init__(self, sendDataThreadQueue, sock, HOST, PORT, streamNumber):
         threading.Thread.__init__(self, name="sendData")
         self.sendDataThreadQueue = sendDataThreadQueue
         state.sendDataQueues.append(self.sendDataThreadQueue)
@@ -30,15 +30,6 @@ class sendDataThread(threading.Thread):
         self.objectHashHolderInstance.daemon = True
         self.objectHashHolderInstance.start()
         self.connectionIsOrWasFullyEstablished = False
-
-
-    def setup(
-        self,
-        sock,
-        HOST,
-        PORT,
-        streamNumber
-        ):
         self.sock = sock
         self.peer = state.Peer(HOST, PORT)
         self.name = "sendData-" + self.peer.host.replace(":", ".") # log parser field separator

@@ -44,22 +44,13 @@ class ProtocolError(Exception): pass
 
 class receiveDataThread(threading.Thread):
 
-    def __init__(self):
+    def __init__(self, sock, HOST, port, streamNumber, sendDataThreadQueue, objectHashHolderInstance):
         threading.Thread.__init__(self, name="receiveData")
         self.data = ''
         self.verackSent = False
         self.verackReceived = False
         self.addrReceived = False
 
-    def setup(
-        self,
-        sock,
-        HOST,
-        port,
-        streamNumber,
-        sendDataThreadQueue,
-        objectHashHolderInstance):
-        
         self.sock = sock
         self.peer = state.Peer(HOST, port)
         self.name = "receiveData-" + self.peer.host.replace(":", ".") # ":" log parser field separator

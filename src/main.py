@@ -75,8 +75,7 @@ def connectToStream(streamNumber):
             knownnodes.knownNodes[streamNumber*2+1] = {}
 
     for i in xrange(maximumNumberOfHalfOpenConnections):
-        a = outgoingSynSender()
-        a.setup(streamNumber)
+        a = outgoingSynSender(streamNumber)
         a.start()
 
 def _fixWinsock():
