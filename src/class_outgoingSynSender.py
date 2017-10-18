@@ -79,7 +79,9 @@ class outgoingSynSender(StoppableThread):
                 sock.shutdown(socket.SHUT_RDWR)
             finally:
                 sock.close()
-        except AttributeError:
+        except socket.error as ex:
+            if ex.errno not in (errno.EBADF, errno.ENOTCONN):
+                logger.exception('Exception shutting down outgoingSynSender')
             return
 
     def run(self):
